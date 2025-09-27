@@ -170,23 +170,36 @@ except ImportError:
         def __init__(self, data_file: str = "leaderboard_data.json"):
             self.data_file = data_file
             self.users = {}
+            # In serverless environment, we'll use environment variables or start fresh
             self.load_data()
         
         def load_data(self) -> None:
-            """Load existing user data from JSON file."""
+            """Load existing user data from JSON file or environment."""
             try:
+                # Try to load from environment variable first
+                import os
+                data_str = os.environ.get('LEADERBOARD_DATA')
+                if data_str:
+                    self.users = json.loads(data_str)
+                    return
+                
+                # Try to load from file (might not work in serverless)
                 with open(self.data_file, 'r') as f:
                     self.users = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
+            except (FileNotFoundError, json.JSONDecodeError, PermissionError):
+                # Start with empty data in serverless environment
                 self.users = {}
         
         def save_data(self) -> None:
             """Save current user data to JSON file."""
             try:
+                # In serverless, we can't persist files, so we'll just keep in memory
+                # In production, you'd use a database like MongoDB, PostgreSQL, etc.
                 with open(self.data_file, 'w') as f:
                     json.dump(self.users, f, indent=2)
             except Exception as e:
-                print(f"Error saving data: {e}")
+                # Silently fail in serverless environment
+                pass
         
         def add_user(self, username: str) -> bool:
             """Add a new user to the leaderboard."""
@@ -299,46 +312,90 @@ app = Flask(__name__,
            static_folder='../static')
 app.secret_key = 'leetcode_leaderboard_secret_key_2025'
 
+# Add error handling
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({
+        'error': 'Internal server error',
+        'message': 'Something went wrong on our end'
+    }), 500
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        'error': 'Not found',
+        'message': 'The requested resource was not found'
+    }), 404
+
 # Global leaderboard instance
-leaderboard = LeetCodeLeaderboard("web_leaderboard_data.json")
+try:
+    leaderboard = LeetCodeLeaderboard("web_leaderboard_data.json")
+except Exception as e:
+    print(f"Error initializing leaderboard: {e}")
+    leaderboard = LeetCodeLeaderboard("web_leaderboard_data.json")
+
+@app.route('/test')
+def test():
+    """Test route to verify the app is working."""
+    return jsonify({
+        'status': 'OK',
+        'message': 'Weekly LeetCode Leaderboard API is working!',
+        'timestamp': datetime.now().isoformat()
+    })
 
 @app.route('/')
 def index():
     """Main weekly leaderboard page."""
-    sort_by = request.args.get('sort_by', 'weekly_advanced_score')
-    leaderboard_data = leaderboard.get_leaderboard(sort_by)
-    
-    # Calculate summary stats including weekly metrics
-    stats = {}
-    if leaderboard_data:
-        # Weekly stats
-        total_weekly_problems = sum(user.get('weekly_total', 0) for user in leaderboard_data)
-        total_weekly_score = sum(user.get('weekly_advanced_score', 0) for user in leaderboard_data)
-        avg_weekly_score = total_weekly_score / len(leaderboard_data) if leaderboard_data else 0
+    try:
+        sort_by = request.args.get('sort_by', 'weekly_advanced_score')
+        leaderboard_data = leaderboard.get_leaderboard(sort_by)
         
-        # Overall stats
-        stats = {
-            'total_users': len(leaderboard_data),
-            'total_problems': sum(user['total_solved'] for user in leaderboard_data),
-            'weekly_problems': total_weekly_problems,
-            'weekly_score': total_weekly_score,
-            'avg_weekly_score': avg_weekly_score,
-            'total_advanced_score': sum(user.get('advanced_score', 0) for user in leaderboard_data),
-            'avg_score': sum(user.get('advanced_score', 0) for user in leaderboard_data) / len(leaderboard_data),
-            'leader': leaderboard_data[0] if leaderboard_data else None,
-            'easy_champion': max(leaderboard_data, key=lambda x: x.get('easy', 0)),
-            'medium_champion': max(leaderboard_data, key=lambda x: x.get('medium', 0)),
-            'hard_champion': max(leaderboard_data, key=lambda x: x.get('hard', 0)),
-            # Weekly champions
-            'weekly_easy_champion': max(leaderboard_data, key=lambda x: x.get('weekly_easy', 0)),
-            'weekly_medium_champion': max(leaderboard_data, key=lambda x: x.get('weekly_medium', 0)),
-            'weekly_hard_champion': max(leaderboard_data, key=lambda x: x.get('weekly_hard', 0))
-        }
-    
-    return render_template('index.html', 
-                         leaderboard=leaderboard_data, 
-                         stats=stats, 
-                         current_sort=sort_by)
+        # Calculate summary stats including weekly metrics
+        stats = {}
+        if leaderboard_data:
+            # Weekly stats
+            total_weekly_problems = sum(user.get('weekly_total', 0) for user in leaderboard_data)
+            total_weekly_score = sum(user.get('weekly_advanced_score', 0) for user in leaderboard_data)
+            avg_weekly_score = total_weekly_score / len(leaderboard_data) if leaderboard_data else 0
+            
+            # Overall stats
+            stats = {
+                'total_users': len(leaderboard_data),
+                'total_problems': sum(user.get('total_solved', 0) for user in leaderboard_data),
+                'weekly_problems': total_weekly_problems,
+                'weekly_score': total_weekly_score,
+                'avg_weekly_score': avg_weekly_score,
+                'total_advanced_score': sum(user.get('advanced_score', 0) for user in leaderboard_data),
+                'avg_score': sum(user.get('advanced_score', 0) for user in leaderboard_data) / len(leaderboard_data) if leaderboard_data else 0,
+                'leader': leaderboard_data[0] if leaderboard_data else None,
+                'easy_champion': max(leaderboard_data, key=lambda x: x.get('easy', 0)) if leaderboard_data else None,
+                'medium_champion': max(leaderboard_data, key=lambda x: x.get('medium', 0)) if leaderboard_data else None,
+                'hard_champion': max(leaderboard_data, key=lambda x: x.get('hard', 0)) if leaderboard_data else None,
+                # Weekly champions
+                'weekly_easy_champion': max(leaderboard_data, key=lambda x: x.get('weekly_easy', 0)) if leaderboard_data else None,
+                'weekly_medium_champion': max(leaderboard_data, key=lambda x: x.get('weekly_medium', 0)) if leaderboard_data else None,
+                'weekly_hard_champion': max(leaderboard_data, key=lambda x: x.get('weekly_hard', 0)) if leaderboard_data else None
+            }
+        
+        return render_template('index.html', 
+                             leaderboard=leaderboard_data, 
+                             stats=stats, 
+                             current_sort=sort_by)
+    except Exception as e:
+        # Return a simple HTML page with error for debugging
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Weekly LeetCode Leaderboard - Error</title></head>
+        <body>
+            <h1>Weekly LeetCode Leaderboard</h1>
+            <h2>Temporarily Unavailable</h2>
+            <p><strong>Error:</strong> {str(e)}</p>
+            <p><a href="/test">Test API Status</a></p>
+            <p>Please try again later or contact support.</p>
+        </body>
+        </html>
+        """, 500
 
 @app.route('/user/<username>')
 def user_details(username):
