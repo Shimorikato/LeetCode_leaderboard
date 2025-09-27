@@ -2,12 +2,297 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
+import requests
 
 # Add the parent directory to the path so we can import our modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
 
-from leetcode_leaderboard import LeetCodeLeaderboard, get_user_stats, calculate_advanced_score
+# Import or define the functions we need
+try:
+    from leetcode_leaderboard import LeetCodeLeaderboard, get_user_stats, calculate_advanced_score
+except ImportError:
+    # Define the functions directly if import fails
+    def get_current_week_bounds():
+        """Get the start and end timestamps for the current week (Monday to Sunday)."""
+        now = datetime.now()
+        days_since_monday = now.weekday()  # Monday is 0, Sunday is 6
+        
+        # Calculate start of week (Monday 00:00:00)
+        week_start = now - timedelta(days=days_since_monday, 
+                                   hours=now.hour, 
+                                   minutes=now.minute, 
+                                   seconds=now.second, 
+                                   microseconds=now.microsecond)
+        
+        # Calculate end of week (Sunday 23:59:59)  
+        week_end = week_start + timedelta(days=6, hours=23, minutes=59, seconds=59)
+        
+        return int(week_start.timestamp()), int(week_end.timestamp())
+
+    def get_user_stats(username: str):
+        """Fetch user statistics from LeetCode GraphQL API."""
+        url = "https://leetcode.com/graphql"
+        
+        query = """
+        query getUserStats($username: String!) {
+            allQuestionsCount {
+                difficulty
+                count
+            }
+            matchedUser(username: $username) {
+                username
+                submitStats {
+                    acSubmissionNum {
+                        difficulty
+                        count
+                    }
+                    totalSubmissionNum {
+                        difficulty
+                        count
+                    }
+                }
+                profile {
+                    ranking
+                    realName
+                    aboutMe
+                    userAvatar
+                    reputation
+                    githubUrl
+                    websites
+                }
+                submissionCalendar
+                recentSubmissionList(limit: 20) {
+                    title
+                    titleSlug
+                    timestamp
+                    statusDisplay
+                    lang
+                }
+            }
+        }
+        """
+        
+        variables = {"username": username}
+        headers = {
+            "Content-Type": "application/json",
+            "Referer": "https://leetcode.com",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+        
+        try:
+            response = requests.post(url, json={"query": query, "variables": variables}, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            
+            if "errors" in data:
+                return None
+                
+            return data.get("data")
+        except Exception as e:
+            print(f"Error fetching data for {username}: {e}")
+            return None
+
+    def calculate_weekly_problems(submission_calendar, recent_submissions):
+        """Calculate problems solved in the current week."""
+        week_start_ts, week_end_ts = get_current_week_bounds()
+        
+        # Parse submission calendar
+        calendar_data = {}
+        try:
+            if submission_calendar:
+                calendar_data = json.loads(submission_calendar)
+        except:
+            calendar_data = {}
+        
+        # Count submissions in current week from calendar
+        weekly_submissions = 0
+        current_ts = week_start_ts
+        while current_ts <= week_end_ts:
+            date_key = str(current_ts)
+            weekly_submissions += calendar_data.get(date_key, 0)
+            current_ts += 86400  # Add one day in seconds
+        
+        # Also check recent submissions for this week
+        recent_weekly = 0
+        if recent_submissions:
+            for submission in recent_submissions:
+                try:
+                    submission_ts = int(submission.get('timestamp', 0))
+                    if week_start_ts <= submission_ts <= week_end_ts:
+                        recent_weekly += 1
+                except:
+                    continue
+        
+        # Use the higher count (calendar data is usually more accurate)
+        return max(weekly_submissions, recent_weekly)
+
+    def calculate_advanced_score(easy: int, medium: int, hard: int, ranking: int, recent_activity: int) -> float:
+        """Calculate advanced score with performance multipliers."""
+        base_score = easy * 1 + medium * 3 + hard * 7
+        
+        if base_score == 0:
+            return 0.0
+        
+        # Ranking multiplier (better ranking = higher multiplier)
+        if ranking <= 0:
+            ranking_multiplier = 1.0
+        elif ranking <= 1000:
+            ranking_multiplier = 2.0
+        elif ranking <= 5000:
+            ranking_multiplier = 1.8
+        elif ranking <= 10000:
+            ranking_multiplier = 1.6
+        elif ranking <= 50000:
+            ranking_multiplier = 1.4
+        elif ranking <= 100000:
+            ranking_multiplier = 1.2
+        else:
+            ranking_multiplier = 1.0
+        
+        # Activity multiplier (more recent activity = higher multiplier)
+        if recent_activity >= 10:
+            activity_multiplier = 1.5
+        elif recent_activity >= 5:
+            activity_multiplier = 1.3
+        elif recent_activity >= 2:
+            activity_multiplier = 1.1
+        else:
+            activity_multiplier = 1.0
+        
+        return base_score * ranking_multiplier * activity_multiplier
+
+    class LeetCodeLeaderboard:
+        """A LeetCode leaderboard to track and compare friend's progress."""
+        
+        def __init__(self, data_file: str = "leaderboard_data.json"):
+            self.data_file = data_file
+            self.users = {}
+            self.load_data()
+        
+        def load_data(self) -> None:
+            """Load existing user data from JSON file."""
+            try:
+                with open(self.data_file, 'r') as f:
+                    self.users = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                self.users = {}
+        
+        def save_data(self) -> None:
+            """Save current user data to JSON file."""
+            try:
+                with open(self.data_file, 'w') as f:
+                    json.dump(self.users, f, indent=2)
+            except Exception as e:
+                print(f"Error saving data: {e}")
+        
+        def add_user(self, username: str) -> bool:
+            """Add a new user to the leaderboard."""
+            try:
+                data = get_user_stats(username)
+                if not data or not data.get("matchedUser"):
+                    return False
+                
+                user_data = data["matchedUser"]
+                submit_stats = user_data.get("submitStats", {}).get("acSubmissionNum", [])
+                
+                # Parse difficulty stats
+                easy = medium = hard = 0
+                for stat in submit_stats:
+                    difficulty = stat.get("difficulty", "").lower()
+                    count = stat.get("count", 0)
+                    
+                    if difficulty == "easy":
+                        easy = count
+                    elif difficulty == "medium":
+                        medium = count
+                    elif difficulty == "hard":
+                        hard = count
+                
+                total_solved = easy + medium + hard
+                
+                # Get additional data
+                profile = user_data.get("profile", {})
+                ranking = profile.get("ranking", 0) or 0
+                recent_submissions = user_data.get("recentSubmissionList", [])
+                submission_calendar = user_data.get("submissionCalendar", "{}")
+                
+                # Calculate weekly stats
+                weekly_total = calculate_weekly_problems(submission_calendar, recent_submissions)
+                
+                # Estimate weekly breakdown (proportional to total)
+                if total_solved > 0:
+                    easy_ratio = easy / total_solved
+                    medium_ratio = medium / total_solved
+                    hard_ratio = hard / total_solved
+                    
+                    weekly_easy = int(weekly_total * easy_ratio)
+                    weekly_medium = int(weekly_total * medium_ratio)
+                    weekly_hard = weekly_total - weekly_easy - weekly_medium
+                else:
+                    weekly_easy = weekly_medium = weekly_hard = 0
+                
+                # Calculate scores
+                base_score = easy * 1 + medium * 3 + hard * 7
+                advanced_score = calculate_advanced_score(easy, medium, hard, ranking, len(recent_submissions))
+                
+                weekly_base_score = weekly_easy * 1 + weekly_medium * 3 + weekly_hard * 7
+                weekly_advanced_score = calculate_advanced_score(weekly_easy, weekly_medium, weekly_hard, ranking, weekly_total)
+                
+                # Store user data
+                user_info = {
+                    "username": user_data.get("username", username),
+                    "total_solved": total_solved,
+                    "easy": easy,
+                    "medium": medium,
+                    "hard": hard,
+                    "base_score": base_score,
+                    "advanced_score": advanced_score,
+                    "weekly_total": weekly_total,
+                    "weekly_easy": weekly_easy,
+                    "weekly_medium": weekly_medium,
+                    "weekly_hard": weekly_hard,
+                    "weekly_base_score": weekly_base_score,
+                    "weekly_advanced_score": weekly_advanced_score,
+                    "ranking": ranking,
+                    "last_updated": datetime.now().isoformat(),
+                    "recent_submissions": recent_submissions[:10]
+                }
+                
+                self.users[username.lower()] = user_info
+                self.save_data()
+                return True
+                
+            except Exception as e:
+                print(f"Error adding user {username}: {e}")
+                return False
+        
+        def get_leaderboard(self, sort_by: str = "weekly_advanced_score"):
+            """Get sorted leaderboard data."""
+            if not self.users:
+                return []
+            
+            # Convert to list and add positions
+            leaderboard = []
+            for user_data in self.users.values():
+                leaderboard.append(dict(user_data))
+            
+            # Sort by specified field
+            reverse_sort = True
+            if sort_by == "ranking":
+                reverse_sort = False
+                # Handle 0 rankings (put them at the end)
+                leaderboard.sort(key=lambda x: x.get(sort_by, float('inf') if reverse_sort else 0), reverse=reverse_sort)
+            else:
+                leaderboard.sort(key=lambda x: x.get(sort_by, 0), reverse=reverse_sort)
+            
+            # Add positions
+            for i, user in enumerate(leaderboard):
+                user['position'] = i + 1
+            
+            return leaderboard
 
 app = Flask(__name__, 
            template_folder='../templates',
