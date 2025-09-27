@@ -436,9 +436,30 @@ def user_details(username):
     
     return render_template('user_details.html', user=user_data, username=username)
 
-@app.route('/add_user')
+@app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
-    """Add user page."""
+    """Add user page and form submission."""
+    if request.method == 'POST':
+        # Handle form submission
+        try:
+            username = request.form.get('username', '').strip()
+            if not username:
+                flash('Username is required', 'error')
+                return redirect(url_for('add_user'))
+            
+            success = leaderboard.add_user(username)
+            if success:
+                flash(f'User {username} added successfully!', 'success')
+                return redirect(url_for('index'))
+            else:
+                flash(f'Failed to add user {username}. Please check the username.', 'error')
+                return redirect(url_for('add_user'))
+        
+        except Exception as e:
+            flash(f'Error: {str(e)}', 'error')
+            return redirect(url_for('add_user'))
+    
+    # Handle GET request - show the form
     try:
         return render_template('add_user.html')
     except Exception as e:
@@ -448,7 +469,7 @@ def add_user():
         <head><title>Add User - Weekly LeetCode Leaderboard</title></head>
         <body>
             <h1>Add User</h1>
-            <form method="POST" action="/api/add_user">
+            <form method="POST">
                 <input type="text" name="username" placeholder="LeetCode Username" required>
                 <button type="submit">Add User</button>
             </form>
