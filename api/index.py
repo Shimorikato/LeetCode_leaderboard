@@ -176,30 +176,48 @@ except ImportError:
         def load_data(self) -> None:
             """Load existing user data from JSON file or environment."""
             try:
-                # Try to load from environment variable first
                 import os
+                import base64
+                
+                # Try to load from base64 encoded environment variable first
+                encoded_data = os.environ.get('LEADERBOARD_DATA_B64')
+                if encoded_data:
+                    try:
+                        decoded_data = base64.b64decode(encoded_data).decode('utf-8')
+                        self.users = json.loads(decoded_data)
+                        print(f"Loaded {len(self.users)} users from environment variables")
+                        return
+                    except Exception as e:
+                        print(f"Error decoding environment data: {e}")
+                
+                # Try to load from plain JSON environment variable
                 data_str = os.environ.get('LEADERBOARD_DATA')
                 if data_str:
                     self.users = json.loads(data_str)
+                    print(f"Loaded {len(self.users)} users from JSON environment variable")
                     return
                 
                 # Try to load from file (might not work in serverless)
                 with open(self.data_file, 'r') as f:
                     self.users = json.load(f)
+                    print(f"Loaded {len(self.users)} users from local file")
             except (FileNotFoundError, json.JSONDecodeError, PermissionError):
                 # Start with empty data in serverless environment
+                print("Starting with empty leaderboard")
                 self.users = {}
         
         def save_data(self) -> None:
             """Save current user data to JSON file."""
             try:
-                # In serverless, we can't persist files, so we'll just keep in memory
-                # In production, you'd use a database like MongoDB, PostgreSQL, etc.
+                # Try to save to local file (works locally, fails in serverless)
                 with open(self.data_file, 'w') as f:
                     json.dump(self.users, f, indent=2)
+                print(f"Saved {len(self.users)} users to local file")
             except Exception as e:
-                # Silently fail in serverless environment
-                pass
+                # In serverless environment, we can't persist files
+                # Data will be lost between requests unless stored in external database
+                print(f"Cannot save to file in serverless environment: {e}")
+                print("Note: Data will be lost between requests. Use environment variables or database for persistence.")
         
         def add_user(self, username: str) -> bool:
             """Add a new user to the leaderboard."""
