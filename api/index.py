@@ -196,45 +196,14 @@ except ImportError:
         }
 
     def calculate_advanced_score(easy: int, medium: int, hard: int, ranking: int, recent_activity: int) -> float:
-        """Calculate advanced score with performance multipliers."""
-        # Base scoring: Easy=1, Medium=3, Hard=7
-        base_score = easy * 1 + medium * 3 + hard * 7
-        
-        if base_score == 0:
-            return 0.0
-        
-        # Ranking multiplier (better ranking = higher multiplier, but more reasonable)
-        if ranking <= 0 or ranking > 5000000:  # No ranking or very low
-            ranking_multiplier = 1.0
-        elif ranking <= 1000:     # Top 1K
-            ranking_multiplier = 1.5
-        elif ranking <= 10000:    # Top 10K
-            ranking_multiplier = 1.3
-        elif ranking <= 50000:    # Top 50K
-            ranking_multiplier = 1.2
-        elif ranking <= 100000:   # Top 100K
-            ranking_multiplier = 1.1
-        else:
-            ranking_multiplier = 1.0
-        
-        # Activity multiplier (more recent activity = slight bonus)
-        if recent_activity >= 15:
-            activity_multiplier = 1.2
-        elif recent_activity >= 10:
-            activity_multiplier = 1.15
-        elif recent_activity >= 5:
-            activity_multiplier = 1.1
-        elif recent_activity >= 2:
-            activity_multiplier = 1.05
-        else:
-            activity_multiplier = 1.0
-        
-        final_score = base_score * ranking_multiplier * activity_multiplier
+        """Calculate score based purely on difficulty and number of questions."""
+        # Simple scoring: Easy=1, Medium=3, Hard=7 (no multipliers)
+        score = easy * 1 + medium * 3 + hard * 7
         
         # Debug output
-        print(f"Debug - Score calculation: base={base_score}, rank_mult={ranking_multiplier:.2f}, activity_mult={activity_multiplier:.2f}, final={final_score:.2f}")
+        print(f"Debug - Score calculation: Easy={easy}×1 + Medium={medium}×3 + Hard={hard}×7 = {score}")
         
-        return round(final_score, 1)
+        return float(score)
 
     class LeetCodeLeaderboard:
         """A LeetCode leaderboard to track and compare friend's progress."""
@@ -338,12 +307,12 @@ except ImportError:
                 weekly_medium = weekly_stats['medium']
                 weekly_hard = weekly_stats['hard']
                 
-                # Calculate scores
+                # Calculate scores (simple difficulty-based scoring)
                 base_score = easy * 1 + medium * 3 + hard * 7
-                advanced_score = calculate_advanced_score(easy, medium, hard, ranking, len(recent_submissions))
+                advanced_score = calculate_advanced_score(easy, medium, hard, 0, 0)  # Pure difficulty scoring
                 
                 weekly_base_score = weekly_easy * 1 + weekly_medium * 3 + weekly_hard * 7
-                weekly_advanced_score = calculate_advanced_score(weekly_easy, weekly_medium, weekly_hard, ranking, weekly_total)
+                weekly_advanced_score = calculate_advanced_score(weekly_easy, weekly_medium, weekly_hard, 0, 0)  # Pure difficulty scoring
                 
                 # Store user data
                 user_info = {
