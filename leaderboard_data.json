@@ -1,0 +1,308 @@
+{
+  "aayush17sty": {
+    "username": "Aayush17sty",
+    "real_name": "Aayush",
+    "ranking": 1638217,
+    "total_solved": 75,
+    "easy": 47,
+    "medium": 26,
+    "hard": 2,
+    "base_score": 139,
+    "languages": {
+      "C++": 7,
+      "Python": 54,
+      "MySQL": 4,
+      "C": 7,
+      "Python3": 1,
+      "Pandas": 2
+    },
+    "topics": {
+      "Array": 37,
+      "Matrix": 1,
+      "String": 18,
+      "Simulation": 3,
+      "Sorting": 8,
+      "Stack": 7,
+      "Queue": 1,
+      "Linked List": 6,
+      "Two Pointers": 13,
+      "Tree": 6,
+      "Binary Tree": 6,
+      "Hash Table": 13,
+      "Ordered Set": 1,
+      "Greedy": 2,
+      "Binary Search": 6,
+      "Depth-First Search": 6,
+      "Breadth-First Search": 3,
+      "Recursion": 4,
+      "Sliding Window": 2,
+      "Bit Manipulation": 2,
+      "Math": 7,
+      "Design": 2,
+      "Database": 5,
+      "Backtracking": 6,
+      "Quickselect": 1,
+      "Dynamic Programming": 5,
+      "Divide and Conquer": 2,
+      "Trie": 1,
+      "Segment Tree": 1,
+      "Monotonic Stack": 2
+    },
+    "recent_submissions": [
+      {
+        "title": "Subsets",
+        "titleSlug": "subsets",
+        "timestamp": "1759006010",
+        "statusDisplay": "Accepted",
+        "lang": "python",
+        "runtime": "1965 ms",
+        "memory": "12.7 MB",
+        "url": "/submissions/detail/1784625980/"
+      },
+      {
+        "title": "Minimum Depth of Binary Tree",
+        "titleSlug": "minimum-depth-of-binary-tree",
+        "timestamp": "1758715580",
+        "statusDisplay": "Accepted",
+        "lang": "python",
+        "runtime": "163 ms",
+        "memory": "96.4 MB",
+        "url": "/submissions/detail/1781204773/"
+      },
+      {
+        "title": "Minimum Depth of Binary Tree",
+        "titleSlug": "minimum-depth-of-binary-tree",
+        "timestamp": "1758715414",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1781202906/"
+      },
+      {
+        "title": "Minimum Depth of Binary Tree",
+        "titleSlug": "minimum-depth-of-binary-tree",
+        "timestamp": "1758715393",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1781202682/"
+      },
+      {
+        "title": "Count Elements With Maximum Frequency",
+        "titleSlug": "count-elements-with-maximum-frequency",
+        "timestamp": "1758571222",
+        "statusDisplay": "Accepted",
+        "lang": "python",
+        "runtime": "11 ms",
+        "memory": "12.4 MB",
+        "url": "/submissions/detail/1779504589/"
+      },
+      {
+        "title": "Minimum Depth of Binary Tree",
+        "titleSlug": "minimum-depth-of-binary-tree",
+        "timestamp": "1758143486",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1774348557/"
+      },
+      {
+        "title": "Minimum Depth of Binary Tree",
+        "titleSlug": "minimum-depth-of-binary-tree",
+        "timestamp": "1758141550",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1774331248/"
+      },
+      {
+        "title": "Single Number",
+        "titleSlug": "single-number",
+        "timestamp": "1757187082",
+        "statusDisplay": "Accepted",
+        "lang": "python",
+        "runtime": "16 ms",
+        "memory": "14.5 MB",
+        "url": "/submissions/detail/1761858533/"
+      },
+      {
+        "title": "Path Sum",
+        "titleSlug": "path-sum",
+        "timestamp": "1757110570",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1760935035/"
+      },
+      {
+        "title": "Path Sum",
+        "titleSlug": "path-sum",
+        "timestamp": "1757110405",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1760934059/"
+      }
+    ],
+    "submission_calendar": "{\"1738022400\": 1, \"1738368000\": 3, \"1738627200\": 11, \"1738713600\": 4, \"1741737600\": 1, \"1743206400\": 2, \"1750377600\": 2, \"1750464000\": 15, \"1750809600\": 1, \"1751673600\": 8, \"1751760000\": 5, \"1751846400\": 6, \"1751932800\": 1, \"1752019200\": 1, \"1752105600\": 2, \"1752364800\": 2, \"1753574400\": 1, \"1753747200\": 4, \"1753833600\": 1, \"1753920000\": 6, \"1754006400\": 4, \"1754179200\": 2, \"1754265600\": 6, \"1754352000\": 7, \"1754784000\": 3, \"1754870400\": 3, \"1754956800\": 3, \"1755043200\": 1, \"1755129600\": 1, \"1755475200\": 5, \"1755561600\": 4, \"1755648000\": 1, \"1755734400\": 2, \"1755820800\": 5, \"1755907200\": 7, \"1755993600\": 4, \"1756080000\": 1, \"1756166400\": 5, \"1756425600\": 7, \"1756512000\": 1, \"1756684800\": 1, \"1756771200\": 1, \"1756857600\": 2, \"1756944000\": 1, \"1757030400\": 2, \"1757116800\": 1, \"1758067200\": 2, \"1758499200\": 1, \"1758672000\": 3, \"1758931200\": 1, \"1727740800\": 1, \"1727827200\": 1, \"1728000000\": 3, \"1729814400\": 6, \"1729900800\": 1, \"1730073600\": 2, \"1730160000\": 3, \"1731196800\": 1, \"1734912000\": 1}",
+    "last_updated": "2025-09-28T02:17:49.476254",
+    "advanced_score": 126.2,
+    "time_analytics": {
+      "daily_submissions": 0,
+      "weekly_submissions": 0,
+      "yearly_submissions": 0,
+      "recent_activity_count": 10
+    }
+  },
+  "lvuyfpznia": {
+    "username": "LvuYfPzniA",
+    "real_name": "LvuYfPzniA",
+    "ranking": 3580850,
+    "total_solved": 20,
+    "easy": 17,
+    "medium": 2,
+    "hard": 1,
+    "base_score": 30,
+    "languages": {
+      "Java": 4,
+      "Python3": 16
+    },
+    "topics": {
+      "Array": 9,
+      "Matrix": 1,
+      "String": 8,
+      "Simulation": 1,
+      "Sorting": 2,
+      "Stack": 1,
+      "Linked List": 2,
+      "Two Pointers": 3,
+      "Hash Table": 6,
+      "Binary Search": 1,
+      "Recursion": 2,
+      "Sliding Window": 1,
+      "Bit Manipulation": 1,
+      "Math": 6,
+      "Backtracking": 1,
+      "Dynamic Programming": 2,
+      "Trie": 1
+    },
+    "recent_submissions": [
+      {
+        "title": "Plus One",
+        "titleSlug": "plus-one",
+        "timestamp": "1759004363",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "0 ms",
+        "memory": "17.7 MB",
+        "url": "/submissions/detail/1784610957/"
+      },
+      {
+        "title": "Min Cost Climbing Stairs",
+        "titleSlug": "min-cost-climbing-stairs",
+        "timestamp": "1758383283",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "3 ms",
+        "memory": "17.8 MB",
+        "url": "/submissions/detail/1777150503/"
+      },
+      {
+        "title": "Climbing Stairs",
+        "titleSlug": "climbing-stairs",
+        "timestamp": "1758378463",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "0 ms",
+        "memory": "17.6 MB",
+        "url": "/submissions/detail/1777082712/"
+      },
+      {
+        "title": "Climbing Stairs",
+        "titleSlug": "climbing-stairs",
+        "timestamp": "1758377408",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1777067757/"
+      },
+      {
+        "title": "Add Binary",
+        "titleSlug": "add-binary",
+        "timestamp": "1758306066",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "0 ms",
+        "memory": "17.7 MB",
+        "url": "/submissions/detail/1776363456/"
+      },
+      {
+        "title": "Add Binary",
+        "titleSlug": "add-binary",
+        "timestamp": "1758306052",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "0 ms",
+        "memory": "17.8 MB",
+        "url": "/submissions/detail/1776363232/"
+      },
+      {
+        "title": "Sudoku Solver",
+        "titleSlug": "sudoku-solver",
+        "timestamp": "1756672511",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "2642 ms",
+        "memory": "18 MB",
+        "url": "/submissions/detail/1755196489/"
+      },
+      {
+        "title": "Valid Anagram",
+        "titleSlug": "valid-anagram",
+        "timestamp": "1756649514",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "3 ms",
+        "memory": "18.1 MB",
+        "url": "/submissions/detail/1754837015/"
+      },
+      {
+        "title": "Valid Anagram",
+        "titleSlug": "valid-anagram",
+        "timestamp": "1756649495",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "7 ms",
+        "memory": "17.9 MB",
+        "url": "/submissions/detail/1754836727/"
+      },
+      {
+        "title": "Valid Anagram",
+        "titleSlug": "valid-anagram",
+        "timestamp": "1756649486",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "6 ms",
+        "memory": "17.8 MB",
+        "url": "/submissions/detail/1754836565/"
+      }
+    ],
+    "submission_calendar": "{\"1747440000\": 2, \"1747612800\": 2, \"1748131200\": 1, \"1754438400\": 1, \"1754611200\": 8, \"1754870400\": 4, \"1754956800\": 1, \"1755907200\": 11, \"1756598400\": 6, \"1758240000\": 2, \"1758326400\": 3, \"1758931200\": 1}",
+    "last_updated": "2025-09-28T02:15:48.877832",
+    "advanced_score": 28.0,
+    "time_analytics": {
+      "daily_submissions": 0,
+      "weekly_submissions": 0,
+      "yearly_submissions": 0,
+      "recent_activity_count": 10
+    },
+    "position": 1
+  }
+}

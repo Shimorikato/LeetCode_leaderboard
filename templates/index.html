@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Weekly LeetCode Leaderboard{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-gradient-primary text-white">
+            <div class="card-body text-center">
+                <h1 class="card-title display-4 mb-0">
+                    <i class="bi bi-calendar-week-fill text-warning"></i>
+                    Weekly LeetCode Leaderboard
+                </h1>
+                <p class="card-text lead">Weekly competition - Fresh start every Monday!</p>
+                <small class="text-light">
+                    <i class="bi bi-info-circle"></i>
+                    Scores reset weekly to encourage consistent practice
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Weekly Statistics Cards -->
+{% if stats %}
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-people-fill fs-1 mb-2"></i>
+                <h3 class="card-title">{{ stats.total_users }}</h3>
+                <p class="card-text">Active Users</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-week fs-1 mb-2"></i>
+                <h3 class="card-title">{{ stats.weekly_problems }}</h3>
+                <p class="card-text">This Week</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-star-fill fs-1 mb-2"></i>
+                <h3 class="card-title">{{ "%.1f"|format(stats.avg_weekly_score) }}</h3>
+                <p class="card-text">Avg Weekly Score</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-danger text-white h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-crown-fill fs-1 mb-2"></i>
+                <h3 class="card-title">{{ stats.leader.username if stats.leader else 'None' }}</h3>
+                <p class="card-text">Current Leader</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Leaderboard Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card bg-secondary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="bi bi-list-ol"></i>
+                    Leaderboard Rankings
+                </h2>
+                <small class="text-muted">
+                    {% set sort_names = {
+                        'advanced_score': 'Advanced Score',
+                        'base_score': 'Base Score', 
+                        'total_solved': 'Total Problems',
+                        'easy': 'Easy Problems',
+                        'medium': 'Medium Problems',
+                        'hard': 'Hard Problems',
+                        'ranking': 'LeetCode Ranking'
+                    } %}
+                    Sorted by: {{ sort_names.get(current_sort, current_sort) }}
+                </small>
+            </div>
+            
+            {% if leaderboard %}
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Rank</th>
+                                <th>User</th>
+                                <th>Weekly Score</th>
+                                <th>Weekly E/M/H</th>
+                                <th>Total Score</th>
+                                <th>Total E/M/H</th>
+                                <th>Activity</th>
+                                <th>LeetCode Rank</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in leaderboard %}
+                            <tr>
+                                <td>
+                                    {% if user.position == 1 %}
+                                        <span class="badge bg-warning text-dark fs-6">🥇 1st</span>
+                                    {% elif user.position == 2 %}
+                                        <span class="badge bg-light text-dark fs-6">🥈 2nd</span>
+                                    {% elif user.position == 3 %}
+                                        <span class="badge bg-warning text-dark fs-6">🥉 3rd</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary fs-6">{{ user.position }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('user_details', username=user.username) }}" 
+                                       class="text-decoration-none text-light fw-bold">
+                                        <i class="bi bi-person-circle"></i>
+                                        {{ user.username }}
+                                    </a>
+                                    {% if user.get('real_name') %}
+                                        <br><small class="text-muted">{{ user.real_name }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary fs-6">
+                                        {{ "%.1f"|format(user.get('weekly_advanced_score', 0)) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-success">{{ user.get('weekly_easy', 0) }}</span>/
+                                    <span class="text-warning">{{ user.get('weekly_medium', 0) }}</span>/
+                                    <span class="text-danger">{{ user.get('weekly_hard', 0) }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary fs-6">
+                                        {{ "%.0f"|format(user.get('advanced_score', 0)) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-success">{{ user.easy }}</span>/
+                                    <span class="text-warning">{{ user.medium }}</span>/
+                                    <span class="text-danger">{{ user.hard }}</span>
+                                </td>
+                                <td>
+                                    {% set weekly_total = user.get('weekly_total', 0) %}
+                                    {% if weekly_total >= 10 %}
+                                        <span class="badge bg-danger">🔥 Very Active</span>
+                                    {% elif weekly_total >= 5 %}
+                                        <span class="badge bg-success">✅ Active</span>
+                                    {% elif weekly_total >= 1 %}
+                                        <span class="badge bg-warning text-dark">⚡ Some</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">😴 Quiet</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.ranking > 0 %}
+                                        #{{ "{:,}".format(user.ranking) }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('user_details', username=user.username) }}" 
+                                           class="btn btn-outline-info btn-sm">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('update_user_route', username=user.username) }}" 
+                                           class="btn btn-outline-warning btn-sm">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </a>
+                                        <a href="{{ url_for('remove_user', username=user.username) }}" 
+                                           class="btn btn-outline-danger btn-sm"
+                                           onclick="return confirm('Remove {{ user.username }} from leaderboard?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="card-body text-center">
+                <div class="py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <h3 class="text-muted mt-3">No users in leaderboard yet!</h3>
+                    <p class="text-muted">Add some friends to start comparing your LeetCode progress.</p>
+                    <a href="{{ url_for('add_user') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-person-plus"></i> Add First User
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Champions Section -->
+{% if stats and leaderboard %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-gradient-dark">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="bi bi-award-fill text-warning"></i>
+                    Category Champions
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 bg-success rounded">
+                            <i class="bi bi-check-circle-fill fs-1 mb-2"></i>
+                            <h5>Easy Champion</h5>
+                            <p class="mb-0">
+                                <strong>{{ stats.easy_champion.username }}</strong><br>
+                                {{ stats.easy_champion.easy }} problems
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 bg-warning text-dark rounded">
+                            <i class="bi bi-lightning-fill fs-1 mb-2"></i>
+                            <h5>Medium Champion</h5>
+                            <p class="mb-0">
+                                <strong>{{ stats.medium_champion.username }}</strong><br>
+                                {{ stats.medium_champion.medium }} problems
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 bg-danger rounded">
+                            <i class="bi bi-fire fs-1 mb-2"></i>
+                            <h5>Hard Champion</h5>
+                            <p class="mb-0">
+                                <strong>{{ stats.hard_champion.username }}</strong><br>
+                                {{ stats.hard_champion.hard }} problems
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

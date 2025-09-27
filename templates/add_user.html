@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Add User - LeetCode Leaderboard{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card bg-secondary">
+            <div class="card-header text-center">
+                <h2 class="mb-0">
+                    <i class="bi bi-person-plus-fill text-primary"></i>
+                    Add New User
+                </h2>
+                <p class="text-muted mt-2">Add a friend to the LeetCode leaderboard</p>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-4">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-at"></i>
+                            LeetCode Username
+                        </label>
+                        <input type="text" 
+                               class="form-control form-control-lg" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Enter LeetCode username"
+                               required 
+                               autofocus>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Make sure the profile is public and the username is correct
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle"></i>
+                            Add User to Leaderboard
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card bg-info text-dark mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightbulb"></i>
+                    Tips for Adding Users
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>The username must be exactly as shown on LeetCode</li>
+                    <li>The user's profile must be public (not private)</li>
+                    <li>It may take a few seconds to fetch user data</li>
+                    <li>You can verify usernames by visiting: <code>https://leetcode.com/username</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Scoring System Explanation -->
+        <div class="card bg-warning text-dark mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-trophy"></i>
+                    Scoring System
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="p-2 bg-success text-white rounded mb-2">
+                            <strong>Easy = 1pt</strong>
+                        </div>
+                        <small>Per problem</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-warning text-dark rounded mb-2">
+                            <strong>Medium = 3pts</strong>
+                        </div>
+                        <small>Per problem</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-danger text-white rounded mb-2">
+                            <strong>Hard = 7pts</strong>
+                        </div>
+                        <small>Per problem</small>
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-0 text-center">
+                    <strong>Advanced Score = Base Score × Performance Multiplier</strong><br>
+                    <small>Performance based on LeetCode ranking and recent activity</small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Add loading state to form submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    const button = e.target.querySelector('button[type="submit"]');
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding User...';
+    button.disabled = true;
+});
+</script>
+{% endblock %}
