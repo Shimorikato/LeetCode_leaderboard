@@ -419,26 +419,62 @@ def user_details(username):
     return render_template('user_details.html', user=user_data, username=username)
 
 @app.route('/add_user')
-def add_user_page():
+def add_user():
     """Add user page."""
-    return render_template('add_user.html')
+    try:
+        return render_template('add_user.html')
+    except Exception as e:
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Add User - Weekly LeetCode Leaderboard</title></head>
+        <body>
+            <h1>Add User</h1>
+            <form method="POST" action="/api/add_user">
+                <input type="text" name="username" placeholder="LeetCode Username" required>
+                <button type="submit">Add User</button>
+            </form>
+            <p><a href="/">Back to Leaderboard</a></p>
+        </body>
+        </html>
+        """
 
 @app.route('/api/add_user', methods=['POST'])
 def api_add_user():
     """API endpoint to add a new user."""
     try:
-        username = request.json.get('username', '').strip()
+        # Handle both JSON and form data
+        if request.is_json:
+            username = request.json.get('username', '').strip()
+        else:
+            username = request.form.get('username', '').strip()
+        
         if not username:
-            return jsonify({'success': False, 'message': 'Username is required'}), 400
+            if request.is_json:
+                return jsonify({'success': False, 'message': 'Username is required'}), 400
+            else:
+                return redirect(url_for('index'))
         
         success = leaderboard.add_user(username)
         if success:
-            return jsonify({'success': True, 'message': f'User {username} added successfully!'})
+            if request.is_json:
+                return jsonify({'success': True, 'message': f'User {username} added successfully!'})
+            else:
+                flash(f'User {username} added successfully!', 'success')
+                return redirect(url_for('index'))
         else:
-            return jsonify({'success': False, 'message': f'Failed to add user {username}. Please check the username.'}), 400
+            if request.is_json:
+                return jsonify({'success': False, 'message': f'Failed to add user {username}. Please check the username.'}), 400
+            else:
+                flash(f'Failed to add user {username}. Please check the username.', 'error')
+                return redirect(url_for('index'))
     
     except Exception as e:
-        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+        if request.is_json:
+            return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+        else:
+            flash(f'Error: {str(e)}', 'error')
+            return redirect(url_for('index'))
 
 @app.route('/api/refresh_user/<username>', methods=['POST'])
 def api_refresh_user(username):
@@ -452,6 +488,31 @@ def api_refresh_user(username):
     
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+@app.route('/update_all')
+def update_all():
+    """Update all users page/redirect."""
+    try:
+        updated_count = 0
+        failed_users = []
+        
+        for username in leaderboard.users.keys():
+            success = leaderboard.add_user(username)
+            if success:
+                updated_count += 1
+            else:
+                failed_users.append(username)
+        
+        message = f'Updated {updated_count} users successfully!'
+        if failed_users:
+            message += f' Failed to update: {", ".join(failed_users)}'
+        
+        flash(message, 'success' if not failed_users else 'warning')
+        return redirect(url_for('index'))
+    
+    except Exception as e:
+        flash(f'Error updating users: {str(e)}', 'error')
+        return redirect(url_for('index'))
 
 @app.route('/api/refresh_all', methods=['POST'])
 def api_refresh_all():
@@ -480,6 +541,36 @@ def api_refresh_all():
     
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+@app.route('/remove_user/<username>')
+def remove_user(username):
+    """Remove user route."""
+    try:
+        username_lower = username.lower()
+        if username_lower in leaderboard.users:
+            del leaderboard.users[username_lower]
+            leaderboard.save_data()
+            flash(f'User {username} removed successfully!', 'success')
+        else:
+            flash(f'User {username} not found', 'error')
+        return redirect(url_for('index'))
+    except Exception as e:
+        flash(f'Error removing user: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+@app.route('/update_user/<username>')
+def update_user_route(username):
+    """Update specific user route."""
+    try:
+        success = leaderboard.add_user(username)
+        if success:
+            flash(f'User {username} updated successfully!', 'success')
+        else:
+            flash(f'Failed to update user {username}', 'error')
+        return redirect(url_for('index'))
+    except Exception as e:
+        flash(f'Error updating user: {str(e)}', 'error')
+        return redirect(url_for('index'))
 
 @app.route('/api/remove_user/<username>', methods=['DELETE'])
 def api_remove_user(username):
