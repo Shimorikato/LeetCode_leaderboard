@@ -64,12 +64,19 @@ except ImportError:
                     websites
                 }
                 submissionCalendar
-                recentSubmissionList(limit: 20) {
+                recentSubmissionList(limit: 50) {
                     title
                     titleSlug
                     timestamp
                     statusDisplay
                     lang
+                    __typename
+                }
+                recentAcSubmissionList(limit: 50) {
+                    id
+                    title
+                    titleSlug
+                    timestamp
                 }
             }
         }
@@ -95,74 +102,139 @@ except ImportError:
             print(f"Error fetching data for {username}: {e}")
             return None
 
-    def calculate_weekly_problems(submission_calendar, recent_submissions):
-        """Calculate problems solved in the current week."""
+    def get_problem_difficulty(title_slug):
+        """Get the difficulty of a specific problem from LeetCode API."""
+        url = "https://leetcode.com/graphql"
+        query = """
+        query questionData($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+                difficulty
+                title
+            }
+        }
+        """
+        
+        try:
+            response = requests.post(url, json={
+                "query": query, 
+                "variables": {"titleSlug": title_slug}
+            }, headers={
+                "Content-Type": "application/json",
+                "Referer": "https://leetcode.com"
+            })
+            
+            if response.status_code == 200:
+                data = response.json()
+                question = data.get('data', {}).get('question', {})
+                return question.get('difficulty', 'Medium').lower()
+        except:
+            pass
+        
+        # Default fallback
+        return 'medium'
+    
+    def calculate_weekly_problems_accurate(recent_submissions, submission_calendar):
+        """Calculate problems solved in the current week with difficulty breakdown."""
         week_start_ts, week_end_ts = get_current_week_bounds()
         
-        # Parse submission calendar
-        calendar_data = {}
-        try:
-            if submission_calendar:
-                calendar_data = json.loads(submission_calendar)
-        except:
-            calendar_data = {}
+        # Track unique problems solved this week with their difficulties
+        weekly_problems = {}  # title_slug -> difficulty
         
-        # Count submissions in current week from calendar
-        weekly_submissions = 0
-        current_ts = week_start_ts
-        while current_ts <= week_end_ts:
-            date_key = str(current_ts)
-            weekly_submissions += calendar_data.get(date_key, 0)
-            current_ts += 86400  # Add one day in seconds
-        
-        # Also check recent submissions for this week
-        recent_weekly = 0
         if recent_submissions:
             for submission in recent_submissions:
                 try:
                     submission_ts = int(submission.get('timestamp', 0))
-                    if week_start_ts <= submission_ts <= week_end_ts:
-                        recent_weekly += 1
+                    status = submission.get('statusDisplay', '')
+                    title_slug = submission.get('titleSlug', '')
+                    
+                    # Only count accepted submissions in current week
+                    if (week_start_ts <= submission_ts <= week_end_ts and 
+                        status == 'Accepted' and title_slug):
+                        
+                        # Avoid duplicate API calls
+                        if title_slug not in weekly_problems:
+                            difficulty = get_problem_difficulty(title_slug)
+                            weekly_problems[title_slug] = difficulty
                 except:
                     continue
         
-        # Use the higher count (calendar data is usually more accurate)
-        return max(weekly_submissions, recent_weekly)
+        # Count by difficulty
+        weekly_easy = sum(1 for d in weekly_problems.values() if d == 'easy')
+        weekly_medium = sum(1 for d in weekly_problems.values() if d == 'medium')
+        weekly_hard = sum(1 for d in weekly_problems.values() if d == 'hard')
+        weekly_total = len(weekly_problems)
+        
+        # Fallback if no recent submissions found
+        if weekly_total == 0:
+            calendar_data = {}
+            try:
+                if submission_calendar:
+                    calendar_data = json.loads(submission_calendar)
+            except:
+                calendar_data = {}
+            
+            # Count submissions in current week from calendar
+            weekly_submissions = 0
+            current_ts = week_start_ts
+            while current_ts <= week_end_ts:
+                date_key = str(current_ts)
+                weekly_submissions += calendar_data.get(date_key, 0)
+                current_ts += 86400  # Add one day in seconds
+            
+            # Rough estimate with typical difficulty distribution
+            estimated_problems = int(weekly_submissions * 0.7)  # 70% acceptance rate
+            weekly_easy = int(estimated_problems * 0.5)    # 50% easy
+            weekly_medium = int(estimated_problems * 0.4)  # 40% medium  
+            weekly_hard = estimated_problems - weekly_easy - weekly_medium  # 10% hard
+            weekly_total = estimated_problems
+        
+        return {
+            'total': weekly_total,
+            'easy': weekly_easy,
+            'medium': weekly_medium,
+            'hard': weekly_hard
+        }
 
     def calculate_advanced_score(easy: int, medium: int, hard: int, ranking: int, recent_activity: int) -> float:
         """Calculate advanced score with performance multipliers."""
+        # Base scoring: Easy=1, Medium=3, Hard=7
         base_score = easy * 1 + medium * 3 + hard * 7
         
         if base_score == 0:
             return 0.0
         
-        # Ranking multiplier (better ranking = higher multiplier)
-        if ranking <= 0:
+        # Ranking multiplier (better ranking = higher multiplier, but more reasonable)
+        if ranking <= 0 or ranking > 5000000:  # No ranking or very low
             ranking_multiplier = 1.0
-        elif ranking <= 1000:
-            ranking_multiplier = 2.0
-        elif ranking <= 5000:
-            ranking_multiplier = 1.8
-        elif ranking <= 10000:
-            ranking_multiplier = 1.6
-        elif ranking <= 50000:
-            ranking_multiplier = 1.4
-        elif ranking <= 100000:
+        elif ranking <= 1000:     # Top 1K
+            ranking_multiplier = 1.5
+        elif ranking <= 10000:    # Top 10K
+            ranking_multiplier = 1.3
+        elif ranking <= 50000:    # Top 50K
             ranking_multiplier = 1.2
+        elif ranking <= 100000:   # Top 100K
+            ranking_multiplier = 1.1
         else:
             ranking_multiplier = 1.0
         
-        # Activity multiplier (more recent activity = higher multiplier)
-        if recent_activity >= 10:
-            activity_multiplier = 1.5
+        # Activity multiplier (more recent activity = slight bonus)
+        if recent_activity >= 15:
+            activity_multiplier = 1.2
+        elif recent_activity >= 10:
+            activity_multiplier = 1.15
         elif recent_activity >= 5:
-            activity_multiplier = 1.3
-        elif recent_activity >= 2:
             activity_multiplier = 1.1
+        elif recent_activity >= 2:
+            activity_multiplier = 1.05
         else:
             activity_multiplier = 1.0
         
-        return base_score * ranking_multiplier * activity_multiplier
+        final_score = base_score * ranking_multiplier * activity_multiplier
+        
+        # Debug output
+        print(f"Debug - Score calculation: base={base_score}, rank_mult={ranking_multiplier:.2f}, activity_mult={activity_multiplier:.2f}, final={final_score:.2f}")
+        
+        return round(final_score, 1)
 
     class LeetCodeLeaderboard:
         """A LeetCode leaderboard to track and compare friend's progress."""
@@ -229,11 +301,16 @@ except ImportError:
                 user_data = data["matchedUser"]
                 submit_stats = user_data.get("submitStats", {}).get("acSubmissionNum", [])
                 
-                # Parse difficulty stats
+                # Parse difficulty stats with better error handling
                 easy = medium = hard = 0
+                
+                print(f"Debug - Submit stats for {username}: {submit_stats}")
+                
                 for stat in submit_stats:
-                    difficulty = stat.get("difficulty", "").lower()
-                    count = stat.get("count", 0)
+                    difficulty = stat.get("difficulty", "").strip().lower()
+                    count = int(stat.get("count", 0))
+                    
+                    print(f"Debug - Processing: difficulty='{difficulty}', count={count}")
                     
                     if difficulty == "easy":
                         easy = count
@@ -241,6 +318,10 @@ except ImportError:
                         medium = count
                     elif difficulty == "hard":
                         hard = count
+                    else:
+                        print(f"Warning: Unknown difficulty '{difficulty}' with count {count}")
+                
+                print(f"Debug - Final counts for {username}: Easy={easy}, Medium={medium}, Hard={hard}")
                 
                 total_solved = easy + medium + hard
                 
@@ -250,20 +331,12 @@ except ImportError:
                 recent_submissions = user_data.get("recentSubmissionList", [])
                 submission_calendar = user_data.get("submissionCalendar", "{}")
                 
-                # Calculate weekly stats
-                weekly_total = calculate_weekly_problems(submission_calendar, recent_submissions)
-                
-                # Estimate weekly breakdown (proportional to total)
-                if total_solved > 0:
-                    easy_ratio = easy / total_solved
-                    medium_ratio = medium / total_solved
-                    hard_ratio = hard / total_solved
-                    
-                    weekly_easy = int(weekly_total * easy_ratio)
-                    weekly_medium = int(weekly_total * medium_ratio)
-                    weekly_hard = weekly_total - weekly_easy - weekly_medium
-                else:
-                    weekly_easy = weekly_medium = weekly_hard = 0
+                # Calculate accurate weekly stats with proper difficulty detection
+                weekly_stats = calculate_weekly_problems_accurate(recent_submissions, submission_calendar)
+                weekly_total = weekly_stats['total']
+                weekly_easy = weekly_stats['easy']
+                weekly_medium = weekly_stats['medium']
+                weekly_hard = weekly_stats['hard']
                 
                 # Calculate scores
                 base_score = easy * 1 + medium * 3 + hard * 7
