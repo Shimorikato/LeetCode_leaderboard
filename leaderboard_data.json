@@ -304,5 +304,144 @@
       "recent_activity_count": 10
     },
     "position": 1
+  },
+  "krasky": {
+    "username": "krasky",
+    "real_name": "krasky",
+    "ranking": 5000001,
+    "total_solved": 4,
+    "easy": 3,
+    "medium": 1,
+    "hard": 0,
+    "base_score": 6,
+    "weekly_total": 0,
+    "weekly_easy": 0,
+    "weekly_medium": 0,
+    "weekly_hard": 0,
+    "weekly_base_score": 0,
+    "current_week": "2025-09-22 to 2025-09-28",
+    "languages": {
+      "Python3": 4
+    },
+    "topics": {
+      "Array": 1,
+      "String": 1,
+      "Linked List": 1,
+      "Hash Table": 2,
+      "Recursion": 1,
+      "Math": 3
+    },
+    "recent_submissions": [
+      {
+        "title": "Add Two Numbers",
+        "titleSlug": "add-two-numbers",
+        "timestamp": "1753698795",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "13 ms",
+        "memory": "17.9 MB",
+        "url": "/submissions/detail/1714397449/"
+      },
+      {
+        "title": "Add Two Numbers",
+        "titleSlug": "add-two-numbers",
+        "timestamp": "1753698617",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1714394676/"
+      },
+      {
+        "title": "Roman to Integer",
+        "titleSlug": "roman-to-integer",
+        "timestamp": "1752297622",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "26 ms",
+        "memory": "17.7 MB",
+        "url": "/submissions/detail/1694886868/"
+      },
+      {
+        "title": "Roman to Integer",
+        "titleSlug": "roman-to-integer",
+        "timestamp": "1752297593",
+        "statusDisplay": "Runtime Error",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1694886507/"
+      },
+      {
+        "title": "Palindrome Number",
+        "titleSlug": "palindrome-number",
+        "timestamp": "1748349635",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "16 ms",
+        "memory": "17.8 MB",
+        "url": "/submissions/detail/1646005742/"
+      },
+      {
+        "title": "Palindrome Number",
+        "titleSlug": "palindrome-number",
+        "timestamp": "1748349620",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1646005541/"
+      },
+      {
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1748349173",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "0 ms",
+        "memory": "19.1 MB",
+        "url": "/submissions/detail/1646000194/"
+      },
+      {
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1748347669",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1645981597/"
+      },
+      {
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1748347609",
+        "statusDisplay": "Runtime Error",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1645980827/"
+      },
+      {
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1748347440",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1645978814/"
+      }
+    ],
+    "submission_calendar": "{\"1748217600\": 7, \"1748304000\": 8, \"1752278400\": 2, \"1753660800\": 2}",
+    "last_updated": "2025-09-28T03:28:53.294398",
+    "weekly_advanced_score": 0.0,
+    "advanced_score": 5.28,
+    "time_analytics": {
+      "daily_submissions": 0,
+      "weekly_submissions": 0,
+      "yearly_submissions": 0,
+      "recent_activity_count": 10
+    }
   }
 }
