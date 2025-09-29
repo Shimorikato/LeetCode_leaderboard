@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 import json
 from datetime import datetime
-from leetcode_leaderboard import LeetCodeLeaderboard, get_user_stats, calculate_advanced_score
+from leetcode_leaderboard import LeetCodeLeaderboard, get_user_stats
 
 app = Flask(__name__)
 app.secret_key = 'leetcode_leaderboard_secret_key_2025'
@@ -12,7 +12,7 @@ leaderboard = LeetCodeLeaderboard("web_leaderboard_data.json")
 @app.route('/')
 def index():
     """Main weekly leaderboard page."""
-    sort_by = request.args.get('sort_by', 'weekly_advanced_score')
+    sort_by = request.args.get('sort_by', 'weekly_base_score')
     leaderboard_data = leaderboard.get_leaderboard(sort_by)
     
     # Calculate summary stats including weekly metrics
@@ -20,7 +20,7 @@ def index():
     if leaderboard_data:
         # Weekly stats
         total_weekly_problems = sum(user.get('weekly_total', 0) for user in leaderboard_data)
-        total_weekly_score = sum(user.get('weekly_advanced_score', 0) for user in leaderboard_data)
+        total_weekly_score = sum(user.get('weekly_base_score', 0) for user in leaderboard_data)
         avg_weekly_score = total_weekly_score / len(leaderboard_data) if leaderboard_data else 0
         
         # Overall stats
@@ -30,8 +30,8 @@ def index():
             'weekly_problems': total_weekly_problems,
             'weekly_score': total_weekly_score,
             'avg_weekly_score': avg_weekly_score,
-            'total_advanced_score': sum(user.get('advanced_score', 0) for user in leaderboard_data),
-            'avg_score': sum(user.get('advanced_score', 0) for user in leaderboard_data) / len(leaderboard_data),
+            'total_base_score': sum(user.get('base_score', 0) for user in leaderboard_data),
+            'avg_score': sum(user.get('base_score', 0) for user in leaderboard_data) / len(leaderboard_data),
             'leader': leaderboard_data[0] if leaderboard_data else None,
             'easy_champion': max(leaderboard_data, key=lambda x: x.get('easy', 0)),
             'medium_champion': max(leaderboard_data, key=lambda x: x.get('medium', 0)),
@@ -123,7 +123,7 @@ def update_all():
 @app.route('/api/leaderboard')
 def api_leaderboard():
     """API endpoint for leaderboard data."""
-    sort_by = request.args.get('sort_by', 'advanced_score')
+    sort_by = request.args.get('sort_by', 'base_score')
     leaderboard_data = leaderboard.get_leaderboard(sort_by)
     return jsonify(leaderboard_data)
 
@@ -147,8 +147,8 @@ def api_stats():
     stats = {
         'total_users': len(leaderboard_data),
         'total_problems': sum(user['total_solved'] for user in leaderboard_data),
-        'total_advanced_score': sum(user.get('advanced_score', 0) for user in leaderboard_data),
-        'avg_score': sum(user.get('advanced_score', 0) for user in leaderboard_data) / len(leaderboard_data),
+        'total_base_score': sum(user.get('base_score', 0) for user in leaderboard_data),
+        'avg_score': sum(user.get('base_score', 0) for user in leaderboard_data) / len(leaderboard_data),
         'leader': leaderboard_data[0]['username'] if leaderboard_data else None
     }
     

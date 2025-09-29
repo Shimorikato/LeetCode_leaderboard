@@ -15,6 +15,7 @@ This project uses Vercel KV for persistent storage in the serverless environment
 ## Alternative: Use Environment Variables (Temporary)
 
 For quick testing, you can add users directly via environment variables in Vercel dashboard:
+
 - Go to Settings > Environment Variables
 - Add: `LEADERBOARD_DATA` with your JSON data
 

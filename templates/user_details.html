@@ -46,9 +46,9 @@
         <div class="card bg-success text-white h-100">
             <div class="card-body text-center">
                 <i class="bi bi-trophy-fill fs-1 mb-3"></i>
-                <h2 class="card-title">{{ "%.1f"|format(user.get('advanced_score', 0)) }}</h2>
-                <p class="card-text">Advanced Score</p>
-                <small class="opacity-75">Base Score × Performance Multiplier</small>
+                <h2 class="card-title">{{ "%.0f"|format(user.get('base_score', 0)) }}</h2>
+                <p class="card-text">Total Score</p>
+                <small class="opacity-75">Easy×1 + Medium×3 + Hard×7</small>
             </div>
         </div>
     </div>

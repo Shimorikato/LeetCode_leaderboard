@@ -2,21 +2,21 @@
   "aayush17sty": {
     "username": "Aayush17sty",
     "real_name": "Aayush",
-    "ranking": 1638217,
-    "total_solved": 76,
-    "easy": 48,
+    "ranking": 1607672,
+    "total_solved": 77,
+    "easy": 49,
     "medium": 26,
     "hard": 2,
-    "base_score": 140,
-    "weekly_total": 9,
-    "weekly_easy": 6,
-    "weekly_medium": 3,
+    "base_score": 141,
+    "weekly_total": 0,
+    "weekly_easy": 0,
+    "weekly_medium": 0,
     "weekly_hard": 0,
-    "weekly_base_score": 15,
-    "current_week": "2025-09-22 to 2025-09-28",
+    "weekly_base_score": 0,
+    "current_week": "2025-09-29 to 2025-10-05",
     "languages": {
-      "C++": 7,
-      "Python": 55,
+      "C++": 8,
+      "Python": 56,
       "MySQL": 4,
       "C": 7,
       "Python3": 1,
@@ -42,19 +42,79 @@
       "Breadth-First Search": 3,
       "Recursion": 4,
       "Sliding Window": 2,
-      "Bit Manipulation": 2,
+      "Bit Manipulation": 3,
       "Math": 7,
       "Design": 2,
       "Database": 5,
       "Backtracking": 6,
       "Quickselect": 1,
       "Dynamic Programming": 5,
-      "Divide and Conquer": 3,
+      "Divide and Conquer": 4,
       "Trie": 1,
       "Segment Tree": 1,
       "Monotonic Stack": 2
     },
     "recent_submissions": [
+      {
+        "title": "Reverse Bits",
+        "titleSlug": "reverse-bits",
+        "timestamp": "1759013535",
+        "statusDisplay": "Wrong Answer",
+        "lang": "cpp",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1784682444/"
+      },
+      {
+        "title": "Number of 1 Bits",
+        "titleSlug": "number-of-1-bits",
+        "timestamp": "1759013067",
+        "statusDisplay": "Accepted",
+        "lang": "python",
+        "runtime": "0 ms",
+        "memory": "12.4 MB",
+        "url": "/submissions/detail/1784679389/"
+      },
+      {
+        "title": "Number of 1 Bits",
+        "titleSlug": "number-of-1-bits",
+        "timestamp": "1759013054",
+        "statusDisplay": "Runtime Error",
+        "lang": "python",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1784679317/"
+      },
+      {
+        "title": "Number of 1 Bits",
+        "titleSlug": "number-of-1-bits",
+        "timestamp": "1759012960",
+        "statusDisplay": "Accepted",
+        "lang": "cpp",
+        "runtime": "0 ms",
+        "memory": "8.3 MB",
+        "url": "/submissions/detail/1784678657/"
+      },
+      {
+        "title": "Longest Palindromic Substring",
+        "titleSlug": "longest-palindromic-substring",
+        "timestamp": "1759012581",
+        "statusDisplay": "Accepted",
+        "lang": "python",
+        "runtime": "335 ms",
+        "memory": "12.5 MB",
+        "url": "/submissions/detail/1784676105/"
+      },
+      {
+        "title": "Palindrome Number",
+        "titleSlug": "palindrome-number",
+        "timestamp": "1759012445",
+        "statusDisplay": "Accepted",
+        "lang": "python",
+        "runtime": "31 ms",
+        "memory": "12.3 MB",
+        "url": "/submissions/detail/1784675133/"
+      },
       {
         "title": "Majority Element",
         "titleSlug": "majority-element",
@@ -94,72 +154,10 @@
         "runtime": "25 ms",
         "memory": "13.7 MB",
         "url": "/submissions/detail/1784628773/"
-      },
-      {
-        "title": "Subsets",
-        "titleSlug": "subsets",
-        "timestamp": "1759006010",
-        "statusDisplay": "Accepted",
-        "lang": "python",
-        "runtime": "1965 ms",
-        "memory": "12.7 MB",
-        "url": "/submissions/detail/1784625980/"
-      },
-      {
-        "title": "Minimum Depth of Binary Tree",
-        "titleSlug": "minimum-depth-of-binary-tree",
-        "timestamp": "1758715580",
-        "statusDisplay": "Accepted",
-        "lang": "python",
-        "runtime": "163 ms",
-        "memory": "96.4 MB",
-        "url": "/submissions/detail/1781204773/"
-      },
-      {
-        "title": "Minimum Depth of Binary Tree",
-        "titleSlug": "minimum-depth-of-binary-tree",
-        "timestamp": "1758715414",
-        "statusDisplay": "Wrong Answer",
-        "lang": "python",
-        "runtime": "N/A",
-        "memory": "N/A",
-        "url": "/submissions/detail/1781202906/"
-      },
-      {
-        "title": "Minimum Depth of Binary Tree",
-        "titleSlug": "minimum-depth-of-binary-tree",
-        "timestamp": "1758715393",
-        "statusDisplay": "Wrong Answer",
-        "lang": "python",
-        "runtime": "N/A",
-        "memory": "N/A",
-        "url": "/submissions/detail/1781202682/"
-      },
-      {
-        "title": "Count Elements With Maximum Frequency",
-        "titleSlug": "count-elements-with-maximum-frequency",
-        "timestamp": "1758571222",
-        "statusDisplay": "Accepted",
-        "lang": "python",
-        "runtime": "11 ms",
-        "memory": "12.4 MB",
-        "url": "/submissions/detail/1779504589/"
-      },
-      {
-        "title": "Minimum Depth of Binary Tree",
-        "titleSlug": "minimum-depth-of-binary-tree",
-        "timestamp": "1758143486",
-        "statusDisplay": "Wrong Answer",
-        "lang": "python",
-        "runtime": "N/A",
-        "memory": "N/A",
-        "url": "/submissions/detail/1774348557/"
       }
     ],
-    "submission_calendar": "{\"1738022400\": 1, \"1738368000\": 3, \"1738627200\": 11, \"1738713600\": 4, \"1741737600\": 1, \"1743206400\": 2, \"1750377600\": 2, \"1750464000\": 15, \"1750809600\": 1, \"1751673600\": 8, \"1751760000\": 5, \"1751846400\": 6, \"1751932800\": 1, \"1752019200\": 1, \"1752105600\": 2, \"1752364800\": 2, \"1753574400\": 1, \"1753747200\": 4, \"1753833600\": 1, \"1753920000\": 6, \"1754006400\": 4, \"1754179200\": 2, \"1754265600\": 6, \"1754352000\": 7, \"1754784000\": 3, \"1754870400\": 3, \"1754956800\": 3, \"1755043200\": 1, \"1755129600\": 1, \"1755475200\": 5, \"1755561600\": 4, \"1755648000\": 1, \"1755734400\": 2, \"1755820800\": 5, \"1755907200\": 7, \"1755993600\": 4, \"1756080000\": 1, \"1756166400\": 5, \"1756425600\": 7, \"1756512000\": 1, \"1756684800\": 1, \"1756771200\": 1, \"1756857600\": 2, \"1756944000\": 1, \"1757030400\": 2, \"1757116800\": 1, \"1758067200\": 2, \"1758499200\": 1, \"1758672000\": 3, \"1758931200\": 5, \"1727740800\": 1, \"1727827200\": 1, \"1728000000\": 3, \"1729814400\": 6, \"1729900800\": 1, \"1730073600\": 2, \"1730160000\": 3, \"1731196800\": 1, \"1734912000\": 1}",
-    "last_updated": "2025-09-28T03:35:08.051975",
-    "weekly_advanced_score": 13.2,
-    "advanced_score": 123.2,
+    "submission_calendar": "{\"1738022400\": 1, \"1738368000\": 3, \"1738627200\": 11, \"1738713600\": 4, \"1741737600\": 1, \"1743206400\": 2, \"1750377600\": 2, \"1750464000\": 15, \"1750809600\": 1, \"1751673600\": 8, \"1751760000\": 5, \"1751846400\": 6, \"1751932800\": 1, \"1752019200\": 1, \"1752105600\": 2, \"1752364800\": 2, \"1753574400\": 1, \"1753747200\": 4, \"1753833600\": 1, \"1753920000\": 6, \"1754006400\": 4, \"1754179200\": 2, \"1754265600\": 6, \"1754352000\": 7, \"1754784000\": 3, \"1754870400\": 3, \"1754956800\": 3, \"1755043200\": 1, \"1755129600\": 1, \"1755475200\": 5, \"1755561600\": 4, \"1755648000\": 1, \"1755734400\": 2, \"1755820800\": 5, \"1755907200\": 7, \"1755993600\": 4, \"1756080000\": 1, \"1756166400\": 5, \"1756425600\": 7, \"1756512000\": 1, \"1756684800\": 1, \"1756771200\": 1, \"1756857600\": 2, \"1756944000\": 1, \"1757030400\": 2, \"1757116800\": 1, \"1758067200\": 2, \"1758499200\": 1, \"1758672000\": 3, \"1758931200\": 11, \"1727740800\": 1, \"1727827200\": 1, \"1728000000\": 3, \"1729814400\": 6, \"1729900800\": 1, \"1730073600\": 2, \"1730160000\": 3, \"1731196800\": 1, \"1734912000\": 1}",
+    "last_updated": "2025-09-29T09:18:23.967454",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -170,18 +168,18 @@
   "lvuyfpznia": {
     "username": "LvuYfPzniA",
     "real_name": "LvuYfPzniA",
-    "ranking": 3580850,
+    "ranking": 3583150,
     "total_solved": 20,
     "easy": 17,
     "medium": 2,
     "hard": 1,
     "base_score": 30,
-    "weekly_total": 1,
-    "weekly_easy": 1,
+    "weekly_total": 2,
+    "weekly_easy": 2,
     "weekly_medium": 0,
     "weekly_hard": 0,
-    "weekly_base_score": 1,
-    "current_week": "2025-09-22 to 2025-09-28",
+    "weekly_base_score": 2,
+    "current_week": "2025-09-29 to 2025-10-05",
     "languages": {
       "Java": 4,
       "Python3": 16
@@ -206,6 +204,46 @@
       "Trie": 1
     },
     "recent_submissions": [
+      {
+        "title": "Min Cost Climbing Stairs",
+        "titleSlug": "min-cost-climbing-stairs",
+        "timestamp": "1759107649",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "0 ms",
+        "memory": "17.9 MB",
+        "url": "/submissions/detail/1785798310/"
+      },
+      {
+        "title": "Min Cost Climbing Stairs",
+        "titleSlug": "min-cost-climbing-stairs",
+        "timestamp": "1759107636",
+        "statusDisplay": "Runtime Error",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1785798218/"
+      },
+      {
+        "title": "Min Cost Climbing Stairs",
+        "titleSlug": "min-cost-climbing-stairs",
+        "timestamp": "1759078564",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "4 ms",
+        "memory": "18.1 MB",
+        "url": "/submissions/detail/1785523164/"
+      },
+      {
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1759011353",
+        "statusDisplay": "Accepted",
+        "lang": "java",
+        "runtime": "2 ms",
+        "memory": "45 MB",
+        "url": "/submissions/detail/1784667819/"
+      },
       {
         "title": "Plus One",
         "titleSlug": "plus-one",
@@ -265,52 +303,10 @@
         "runtime": "0 ms",
         "memory": "17.8 MB",
         "url": "/submissions/detail/1776363232/"
-      },
-      {
-        "title": "Sudoku Solver",
-        "titleSlug": "sudoku-solver",
-        "timestamp": "1756672511",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "2642 ms",
-        "memory": "18 MB",
-        "url": "/submissions/detail/1755196489/"
-      },
-      {
-        "title": "Valid Anagram",
-        "titleSlug": "valid-anagram",
-        "timestamp": "1756649514",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "3 ms",
-        "memory": "18.1 MB",
-        "url": "/submissions/detail/1754837015/"
-      },
-      {
-        "title": "Valid Anagram",
-        "titleSlug": "valid-anagram",
-        "timestamp": "1756649495",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "7 ms",
-        "memory": "17.9 MB",
-        "url": "/submissions/detail/1754836727/"
-      },
-      {
-        "title": "Valid Anagram",
-        "titleSlug": "valid-anagram",
-        "timestamp": "1756649486",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "6 ms",
-        "memory": "17.8 MB",
-        "url": "/submissions/detail/1754836565/"
       }
     ],
-    "submission_calendar": "{\"1747440000\": 2, \"1747612800\": 2, \"1748131200\": 1, \"1754438400\": 1, \"1754611200\": 8, \"1754870400\": 4, \"1754956800\": 1, \"1755907200\": 11, \"1756598400\": 6, \"1758240000\": 2, \"1758326400\": 3, \"1758931200\": 1}",
-    "last_updated": "2025-09-28T03:35:10.605362",
-    "weekly_advanced_score": 0.8,
-    "advanced_score": 26.4,
+    "submission_calendar": "{\"1747440000\": 2, \"1747612800\": 2, \"1748131200\": 1, \"1754438400\": 1, \"1754611200\": 8, \"1754870400\": 4, \"1754956800\": 1, \"1755907200\": 11, \"1756598400\": 6, \"1758240000\": 2, \"1758326400\": 3, \"1758931200\": 2, \"1759017600\": 1, \"1759104000\": 2}",
+    "last_updated": "2025-09-29T09:18:26.231945",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -321,18 +317,18 @@
   "tanishq_kochar": {
     "username": "Tanishq_Kochar",
     "real_name": "Krasky",
-    "ranking": 3134312,
+    "ranking": 3136218,
     "total_solved": 26,
     "easy": 15,
     "medium": 8,
     "hard": 3,
     "base_score": 60,
-    "weekly_total": 2,
-    "weekly_easy": 2,
+    "weekly_total": 0,
+    "weekly_easy": 0,
     "weekly_medium": 0,
     "weekly_hard": 0,
-    "weekly_base_score": 2,
-    "current_week": "2025-09-22 to 2025-09-28",
+    "weekly_base_score": 0,
+    "current_week": "2025-09-29 to 2025-10-05",
     "languages": {
       "C++": 25,
       "JavaScript": 1
@@ -359,6 +355,16 @@
       "Monotonic Stack": 1
     },
     "recent_submissions": [
+      {
+        "title": "Palindrome Number",
+        "titleSlug": "palindrome-number",
+        "timestamp": "1759012341",
+        "statusDisplay": "Accepted",
+        "lang": "cpp",
+        "runtime": "0 ms",
+        "memory": "8.5 MB",
+        "url": "/submissions/detail/1784674441/"
+      },
       {
         "title": "Two Sum",
         "titleSlug": "two-sum",
@@ -448,22 +454,10 @@
         "runtime": "N/A",
         "memory": "N/A",
         "url": "/submissions/detail/1498042595/"
-      },
-      {
-        "title": "Find Mirror Score of a String",
-        "titleSlug": "find-mirror-score-of-a-string",
-        "timestamp": "1736046989",
-        "statusDisplay": "Time Limit Exceeded",
-        "lang": "cpp",
-        "runtime": "N/A",
-        "memory": "N/A",
-        "url": "/submissions/detail/1498042031/"
       }
     ],
-    "submission_calendar": "{\"1736035200\": 7, \"1736640000\": 2, \"1749168000\": 2, \"1753142400\": 2, \"1758931200\": 2, \"1733356800\": 1, \"1733443200\": 2, \"1733529600\": 1, \"1733702400\": 6, \"1733961600\": 1}",
-    "last_updated": "2025-09-28T03:52:27.580046",
-    "weekly_advanced_score": 1.6,
-    "advanced_score": 52.8,
+    "submission_calendar": "{\"1736035200\": 7, \"1736640000\": 2, \"1749168000\": 2, \"1753142400\": 2, \"1758931200\": 3, \"1733356800\": 1, \"1733443200\": 2, \"1733529600\": 1, \"1733702400\": 6, \"1733961600\": 1}",
+    "last_updated": "2025-09-29T09:18:28.107203",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,

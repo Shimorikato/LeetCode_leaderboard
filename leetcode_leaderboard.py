@@ -285,87 +285,6 @@ def get_problem_difficulty(title_slug: str) -> str:
     return "Medium"
 
 
-def calculate_advanced_score(user_data: Dict, use_weekly: bool = True) -> float:
-    """
-    Calculate advanced score based on weekly or total performance.
-    
-    Scoring system:
-    - Easy: 1 point base × performance multiplier
-    - Medium: 3 points base × performance multiplier  
-    - Hard: 7 points base × performance multiplier
-    
-    Args:
-        user_data: User data dictionary
-        use_weekly: If True, use weekly scores; if False, use total scores
-        
-    Returns:
-        Advanced score as float
-    """
-    if use_weekly:
-        base_score = user_data.get("weekly_base_score", 0)
-        problems_solved = user_data.get("weekly_total", 0)
-    else:
-        base_score = user_data.get("base_score", 0)
-        problems_solved = user_data.get("total_solved", 0)
-    
-    if base_score == 0:
-        return 0.0
-    
-    # Performance multiplier based on ranking and activity
-    ranking = user_data.get("ranking", 1000000)
-    
-    # Better ranking = higher multiplier
-    if ranking > 0 and ranking < 50000:
-        performance_multiplier = 1.5  # Top performers
-    elif ranking < 100000:
-        performance_multiplier = 1.3  # Very good
-    elif ranking < 300000:
-        performance_multiplier = 1.1  # Good
-    elif ranking < 500000:
-        performance_multiplier = 1.0  # Average
-    else:
-        performance_multiplier = 0.8  # Below average
-    
-    # Weekly activity bonus
-    if use_weekly:
-        weekly_total = user_data.get("weekly_total", 0)
-        if weekly_total >= 10:
-            activity_bonus = 1.2  # Very active this week
-        elif weekly_total >= 5:
-            activity_bonus = 1.1  # Active this week
-        elif weekly_total >= 1:
-            activity_bonus = 1.0  # Some activity this week
-        else:
-            activity_bonus = 0.0  # No activity this week
-    else:
-        # For total scores, use recent submissions
-        recent_submissions = user_data.get("recent_submissions", [])
-        if len(recent_submissions) >= 5:
-            activity_bonus = 1.1
-        elif len(recent_submissions) >= 2:
-            activity_bonus = 1.05
-        else:
-            activity_bonus = 1.0
-    
-    # Calculate final advanced score
-    advanced_score = base_score * performance_multiplier * activity_bonus
-    
-    return round(advanced_score, 2)
-
-
-def calculate_weekly_advanced_score(user_data: Dict) -> float:
-    """
-    Calculate weekly advanced score specifically.
-    
-    Args:
-        user_data: User data dictionary
-        
-    Returns:
-        Weekly advanced score as float
-    """
-    return calculate_advanced_score(user_data, use_weekly=True)
-
-
 def analyze_time_frames(submission_calendar: str, recent_submissions: List) -> Dict:
     """
     Analyze user activity across different time frames.
@@ -459,9 +378,7 @@ class LeetCodeLeaderboard:
         user_stats = get_user_stats(username)
         
         if user_stats:
-            # Calculate both weekly and total advanced scores
-            user_stats["weekly_advanced_score"] = calculate_weekly_advanced_score(user_stats)
-            user_stats["advanced_score"] = calculate_advanced_score(user_stats, use_weekly=False)
+            # Calculate time analytics
             user_stats["time_analytics"] = analyze_time_frames(
                 user_stats.get("submission_calendar", ""),
                 user_stats.get("recent_submissions", [])
@@ -470,8 +387,8 @@ class LeetCodeLeaderboard:
             self.users[username.lower()] = user_stats
             self.save_data()
             print(f"✅ Added {username} to leaderboard!")
-            print(f"📊 Weekly Score: {user_stats.get('weekly_base_score', 0)} (Base) | {user_stats.get('weekly_advanced_score', 0)} (Advanced)")
-            print(f"📈 Total Score: {user_stats.get('base_score', 0)} (Base) | {user_stats.get('advanced_score', 0)} (Advanced)")
+            print(f"📊 Weekly Score: {user_stats.get('weekly_base_score', 0)} pts")
+            print(f"📈 Total Score: {user_stats.get('base_score', 0)} pts")
             print(f"🗓️ Current Week: {user_stats.get('current_week', 'Unknown')}")
             return True
         else:
@@ -500,9 +417,7 @@ class LeetCodeLeaderboard:
             user_stats = get_user_stats(username)
             
             if user_stats:
-                # Calculate both weekly and total advanced scores
-                user_stats["weekly_advanced_score"] = calculate_weekly_advanced_score(user_stats)
-                user_stats["advanced_score"] = calculate_advanced_score(user_stats, use_weekly=False)
+                # Calculate time analytics
                 user_stats["time_analytics"] = analyze_time_frames(
                     user_stats.get("submission_calendar", ""),
                     user_stats.get("recent_submissions", [])
@@ -510,7 +425,7 @@ class LeetCodeLeaderboard:
                 
                 self.users[username] = user_stats
                 updated += 1
-                print(f"   📊 {username}: Weekly {user_stats.get('weekly_advanced_score', 0)} | Total {user_stats.get('advanced_score', 0)}")
+                print(f"   📊 {username}: Weekly {user_stats.get('weekly_base_score', 0)} | Total {user_stats.get('base_score', 0)}")
                 time.sleep(1)  # Be nice to LeetCode's servers
             else:
                 print(f"⚠️ Could not update {username}")
@@ -529,9 +444,7 @@ class LeetCodeLeaderboard:
         user_stats = get_user_stats(username)
         
         if user_stats:
-            # Calculate both weekly and total advanced scores
-            user_stats["weekly_advanced_score"] = calculate_weekly_advanced_score(user_stats)
-            user_stats["advanced_score"] = calculate_advanced_score(user_stats, use_weekly=False)
+            # Calculate time analytics
             user_stats["time_analytics"] = analyze_time_frames(
                 user_stats.get("submission_calendar", ""),
                 user_stats.get("recent_submissions", [])
@@ -540,20 +453,20 @@ class LeetCodeLeaderboard:
             self.users[username_lower] = user_stats
             self.save_data()
             print(f"✅ Updated {username}")
-            print(f"📊 Weekly Score: {user_stats.get('weekly_base_score', 0)} (Base) | {user_stats.get('weekly_advanced_score', 0)} (Advanced)")
-            print(f"📈 Total Score: {user_stats.get('base_score', 0)} (Base) | {user_stats.get('advanced_score', 0)} (Advanced)")
+            print(f"📊 Weekly Score: {user_stats.get('weekly_base_score', 0)} pts")
+            print(f"📈 Total Score: {user_stats.get('base_score', 0)} pts")
             return True
         else:
             print(f"❌ Could not update {username}")
             return False
     
-    def get_leaderboard(self, sort_by: str = "weekly_advanced_score") -> List[Dict]:
+    def get_leaderboard(self, sort_by: str = "weekly_base_score") -> List[Dict]:
         """
         Get sorted leaderboard data with weekly scoring support.
         
         Args:
-            sort_by: Field to sort by (weekly_advanced_score, weekly_base_score, weekly_total, 
-                    advanced_score, base_score, total_solved, easy, medium, hard, ranking)
+            sort_by: Field to sort by (weekly_base_score, weekly_total, 
+                    base_score, total_solved, easy, medium, hard, ranking)
             
         Returns:
             List of user data sorted by specified field
@@ -561,12 +474,8 @@ class LeetCodeLeaderboard:
         if not self.users:
             return []
         
-        # Ensure all users have weekly scores calculated
+        # Ensure all users have time analytics calculated
         for user_data in self.users.values():
-            if 'weekly_advanced_score' not in user_data:
-                user_data['weekly_advanced_score'] = calculate_weekly_advanced_score(user_data)
-            if 'advanced_score' not in user_data:
-                user_data['advanced_score'] = calculate_advanced_score(user_data, use_weekly=False)
             if 'time_analytics' not in user_data:
                 user_data['time_analytics'] = analyze_time_frames(
                     user_data.get("submission_calendar", ""),
@@ -587,7 +496,7 @@ class LeetCodeLeaderboard:
             
         return sorted_users
     
-    def display_leaderboard(self, sort_by: str = "weekly_advanced_score") -> None:
+    def display_leaderboard(self, sort_by: str = "weekly_base_score") -> None:
         """Display the weekly leaderboard with weekly scoring metrics."""
         leaderboard = self.get_leaderboard(sort_by)
         
@@ -609,11 +518,9 @@ class LeetCodeLeaderboard:
         
         # Sort indicator
         sort_names = {
-            "weekly_advanced_score": "Weekly Advanced Score",
-            "weekly_base_score": "Weekly Base Score",
+            "weekly_base_score": "Weekly Score",
             "weekly_total": "Weekly Problems Solved",
-            "advanced_score": "Total Advanced Score",
-            "base_score": "Total Base Score",
+            "base_score": "Total Score",
             "total_solved": "Total Problems Solved",
             "easy": "Total Easy Problems",
             "medium": "Total Medium Problems", 
@@ -633,7 +540,6 @@ class LeetCodeLeaderboard:
             pos_emoji = "🥇" if user['position'] == 1 else "🥈" if user['position'] == 2 else "🥉" if user['position'] == 3 else f"{user['position']:2d}."
             
             # Weekly scores
-            weekly_adv_score = user.get('weekly_advanced_score', 0)
             weekly_base_score = user.get('weekly_base_score', 0)
             
             # Weekly difficulty breakdown
@@ -643,7 +549,7 @@ class LeetCodeLeaderboard:
             weekly_emh_str = f"{weekly_easy}/{weekly_medium}/{weekly_hard}"
             
             # Total scores and breakdown  
-            total_adv_score = user.get('advanced_score', 0)
+            total_base_score = user.get('base_score', 0)
             total_easy = user.get('easy', 0)
             total_medium = user.get('medium', 0)
             total_hard = user.get('hard', 0)
@@ -671,8 +577,8 @@ class LeetCodeLeaderboard:
                 activity = "😴 Quiet"
             
             # Format scores for display
-            week_score_str = f"{weekly_adv_score:.1f}"
-            total_score_str = f"{total_adv_score:.0f}"
+            week_score_str = f"{weekly_base_score:.0f}"
+            total_score_str = f"{total_base_score:.0f}"
             
             print(f"{pos_emoji:<4} {user['username']:<16} {week_score_str:<11} {weekly_emh_str:<12} "
                   f"{total_score_str:<12} {total_emh_str:<12} {ranking_str:<10} {activity:<12} {time_str}")
@@ -685,14 +591,14 @@ class LeetCodeLeaderboard:
             
             # Weekly stats
             total_weekly_problems = sum(user.get('weekly_total', 0) for user in leaderboard)
-            total_weekly_score = sum(user.get('weekly_advanced_score', 0) for user in leaderboard)
+            total_weekly_score = sum(user.get('weekly_base_score', 0) for user in leaderboard)
             avg_weekly_score = total_weekly_score / len(leaderboard)
             
             # Overall stats
             total_problems = sum(user['total_solved'] for user in leaderboard)
             
             print(f"📊 This Week: {total_weekly_problems} problems solved | Avg weekly score: {avg_weekly_score:.1f}")
-            print(f"🏆 Weekly Leader: {leader['username']} | Weekly Score: {leader.get('weekly_advanced_score', 0):.1f} | Weekly Problems: {leader.get('weekly_total', 0)}")
+            print(f"🏆 Weekly Leader: {leader['username']} | Weekly Score: {leader.get('weekly_base_score', 0):.0f} | Weekly Problems: {leader.get('weekly_total', 0)}")
             
             # Weekly champions by difficulty
             weekly_easy_leader = max(leaderboard, key=lambda x: x.get('weekly_easy', 0))
@@ -729,10 +635,9 @@ class LeetCodeLeaderboard:
         # Scoring Information
         print("\n🎯 Scoring Metrics:")
         base_score = user.get('base_score', 0)
-        adv_score = user.get('advanced_score', 0)
-        print(f"├─ Base Score: {base_score} pts (Easy×1 + Medium×3 + Hard×7)")
-        print(f"├─ Advanced Score: {adv_score:.1f} pts (Base × Performance Multiplier)")
-        print(f"└─ Performance Ratio: {adv_score/base_score:.2f}x" if base_score > 0 else "└─ Performance Ratio: N/A")
+        weekly_score = user.get('weekly_base_score', 0)
+        print(f"├─ Total Score: {base_score} pts (Easy×1 + Medium×3 + Hard×7)")
+        print(f"└─ Weekly Score: {weekly_score} pts")
         
         # Problem Breakdown  
         print(f"\n📚 Problem Breakdown:")
@@ -867,7 +772,7 @@ def main():
                 print("  • Medium problems = 3 points each")
                 print("  • Hard problems = 7 points each")
                 print("  • Weekly score = Problems solved THIS WEEK only")
-                print("  • Advanced score = Base score × Performance multiplier")
+                print("  • Pure difficulty-based scoring (no multipliers)")
                 print("  • Competition resets every Monday!")
                 print("\n📅 Current Week: Monday to Sunday scoring period")
             
@@ -893,14 +798,13 @@ def main():
                     leaderboard.update_user(username)
             
             elif cmd == "show":
-                sort_by = "weekly_advanced_score"  # Default to weekly advanced score
+                sort_by = "weekly_base_score"  # Default to weekly base score
                 if len(parts) > 1:
                     sort_options = {
-                        "weekly": "weekly_advanced_score",
+                        "weekly": "weekly_base_score",
                         "weekly_base": "weekly_base_score", 
                         "weekly_total": "weekly_total",
-                        "score": "advanced_score",
-                        "advanced": "advanced_score", 
+                        "score": "base_score",
                         "base": "base_score",
                         "easy": "easy",
                         "medium": "medium", 
@@ -908,7 +812,7 @@ def main():
                         "ranking": "ranking",
                         "total": "total_solved"
                     }
-                    sort_by = sort_options.get(parts[1], "weekly_advanced_score")
+                    sort_by = sort_options.get(parts[1], "weekly_base_score")
                 
                 leaderboard.display_leaderboard(sort_by)
             
