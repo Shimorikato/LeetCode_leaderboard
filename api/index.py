@@ -679,5 +679,46 @@ def api_leaderboard():
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
+
+@app.route('/api/debug')
+def debug_env():
+    """Debug endpoint to check environment variables and data loading."""
+    import base64
+    
+    debug_info = {
+        'env_var_exists': 'LEADERBOARD_DATA_B64' in os.environ,
+        'env_var_length': len(os.environ.get('LEADERBOARD_DATA_B64', '')),
+        'users_count': len(leaderboard.users),
+        'users_list': list(leaderboard.users.keys()),
+        'sample_user_data': {}
+    }
+    
+    # Get sample data from first user if exists
+    if leaderboard.users:
+        first_user = list(leaderboard.users.keys())[0]
+        user_data = leaderboard.users[first_user]
+        debug_info['sample_user_data'] = {
+            'username': user_data.get('username'),
+            'total_score': user_data.get('base_score', 0),
+            'weekly_score': user_data.get('weekly_base_score', 0),
+            'last_updated': user_data.get('last_updated')
+        }
+    
+    # Try to decode env var
+    if debug_info['env_var_exists']:
+        try:
+            encoded_data = os.environ.get('LEADERBOARD_DATA_B64')
+            decoded_data = base64.b64decode(encoded_data).decode('utf-8')
+            decoded_json = json.loads(decoded_data)
+            debug_info['env_decode_success'] = True
+            debug_info['env_users_count'] = len(decoded_json)
+            debug_info['env_users_list'] = list(decoded_json.keys())
+        except Exception as e:
+            debug_info['env_decode_success'] = False
+            debug_info['env_decode_error'] = str(e)
+    
+    return jsonify(debug_info)
+
+
 # This is required for Vercel
 app = app
