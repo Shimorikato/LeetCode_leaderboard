@@ -29,7 +29,7 @@
         <div class="card bg-info text-white h-100">
             <div class="card-body text-center">
                 <i class="bi bi-people-fill fs-1 mb-2"></i>
-                <h3 class="card-title">{{ stats.total_users }}</h3>
+                <h3 class="card-title" id="total-users">{{ stats.total_users }}</h3>
                 <p class="card-text">Active Users</p>
             </div>
         </div>
@@ -38,7 +38,7 @@
         <div class="card bg-success text-white h-100">
             <div class="card-body text-center">
                 <i class="bi bi-calendar-week fs-1 mb-2"></i>
-                <h3 class="card-title">{{ stats.weekly_problems }}</h3>
+                <h3 class="card-title" id="weekly-problems">{{ stats.weekly_problems }}</h3>
                 <p class="card-text">This Week</p>
             </div>
         </div>
@@ -47,7 +47,7 @@
         <div class="card bg-warning text-dark h-100">
             <div class="card-body text-center">
                 <i class="bi bi-star-fill fs-1 mb-2"></i>
-                <h3 class="card-title">{{ "%.1f"|format(stats.avg_weekly_score) }}</h3>
+                <h3 class="card-title" id="avg-weekly-score">{{ "%.1f"|format(stats.avg_weekly_score) }}</h3>
                 <p class="card-text">Avg Weekly Score</p>
             </div>
         </div>
@@ -56,7 +56,7 @@
         <div class="card bg-danger text-white h-100">
             <div class="card-body text-center">
                 <i class="bi bi-crown-fill fs-1 mb-2"></i>
-                <h3 class="card-title">{{ stats.leader.username if stats.leader else 'None' }}</h3>
+                <h3 class="card-title" id="weekly-leader">{{ stats.leader.username if stats.leader else 'None' }}</h3>
                 <p class="card-text">Current Leader</p>
             </div>
         </div>
@@ -90,7 +90,7 @@
             {% if leaderboard %}
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-dark table-hover mb-0">
+                    <table class="table table-dark table-hover mb-0" id="leaderboard-table">
                         <thead class="table-primary">
                             <tr>
                                 <th>Rank</th>
@@ -99,9 +99,9 @@
                                 <th>Weekly E/M/H</th>
                                 <th>Total Score</th>
                                 <th>Total E/M/H</th>
-                                <th>Activity</th>
                                 <th>LeetCode Rank</th>
-                                <th>Actions</th>
+                                <th>Activity</th>
+                                <th>Last Updated</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -109,56 +109,32 @@
                             <tr>
                                 <td>
                                     {% if user.position == 1 %}
-                                        <span class="badge bg-warning text-dark fs-6">🥇 1st</span>
+                                        <span class="badge bg-warning text-dark fs-6">🥇</span>
                                     {% elif user.position == 2 %}
-                                        <span class="badge bg-light text-dark fs-6">🥈 2nd</span>
+                                        <span class="badge bg-light text-dark fs-6">🥈</span>
                                     {% elif user.position == 3 %}
-                                        <span class="badge bg-warning text-dark fs-6">🥉 3rd</span>
+                                        <span class="badge bg-warning text-dark fs-6">🥉</span>
                                     {% else %}
-                                        <span class="badge bg-secondary fs-6">{{ user.position }}</span>
+                                        <strong>{{ user.position }}.</strong>
                                     {% endif %}
                                 </td>
                                 <td>
                                     <a href="{{ url_for('user_details', username=user.username) }}" 
                                        class="text-decoration-none text-light fw-bold">
-                                        <i class="bi bi-person-circle"></i>
                                         {{ user.username }}
                                     </a>
-                                    {% if user.get('real_name') %}
-                                        <br><small class="text-muted">{{ user.real_name }}</small>
-                                    {% endif %}
                                 </td>
                                 <td>
-                                    <span class="badge bg-primary fs-6">
-                                        {{ "%.0f"|format(user.get('weekly_base_score', 0)) }}
-                                    </span>
+                                    <strong>{{ "%.0f"|format(user.get('weekly_base_score', 0)) }}</strong>
                                 </td>
                                 <td>
-                                    <span class="text-success">{{ user.get('weekly_easy', 0) }}</span>/
-                                    <span class="text-warning">{{ user.get('weekly_medium', 0) }}</span>/
-                                    <span class="text-danger">{{ user.get('weekly_hard', 0) }}</span>
+                                    {{ user.get('weekly_easy', 0) }}/{{ user.get('weekly_medium', 0) }}/{{ user.get('weekly_hard', 0) }}
                                 </td>
                                 <td>
-                                    <span class="badge bg-secondary fs-6">
-                                        {{ "%.0f"|format(user.get('base_score', 0)) }}
-                                    </span>
+                                    <strong>{{ "%.0f"|format(user.get('base_score', 0)) }}</strong>
                                 </td>
                                 <td>
-                                    <span class="text-success">{{ user.easy }}</span>/
-                                    <span class="text-warning">{{ user.medium }}</span>/
-                                    <span class="text-danger">{{ user.hard }}</span>
-                                </td>
-                                <td>
-                                    {% set weekly_total = user.get('weekly_total', 0) %}
-                                    {% if weekly_total >= 10 %}
-                                        <span class="badge bg-danger">🔥 Very Active</span>
-                                    {% elif weekly_total >= 5 %}
-                                        <span class="badge bg-success">✅ Active</span>
-                                    {% elif weekly_total >= 1 %}
-                                        <span class="badge bg-warning text-dark">⚡ Some</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">😴 Quiet</span>
-                                    {% endif %}
+                                    {{ user.easy }}/{{ user.medium }}/{{ user.hard }}
                                 </td>
                                 <td>
                                     {% if user.ranking > 0 %}
@@ -168,21 +144,24 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{{ url_for('user_details', username=user.username) }}" 
-                                           class="btn btn-outline-info btn-sm">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ url_for('update_user_route', username=user.username) }}" 
-                                           class="btn btn-outline-warning btn-sm">
-                                            <i class="bi bi-arrow-clockwise"></i>
-                                        </a>
-                                        <a href="{{ url_for('remove_user', username=user.username) }}" 
-                                           class="btn btn-outline-danger btn-sm"
-                                           onclick="return confirm('Remove {{ user.username }} from leaderboard?')">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-                                    </div>
+                                    {% set weekly_total = user.get('weekly_total', 0) %}
+                                    {% if weekly_total >= 10 %}
+                                        🔥 Very Active
+                                    {% elif weekly_total >= 5 %}
+                                        ✅ Active
+                                    {% elif weekly_total >= 1 %}
+                                        ⚡ Some
+                                    {% else %}
+                                        😴 Quiet
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.last_updated %}
+                                        {% set updated_date = user.last_updated[:10] %}
+                                        {{ updated_date[5:7] }}/{{ updated_date[8:10] }}
+                                    {% else %}
+                                        Unknown
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}

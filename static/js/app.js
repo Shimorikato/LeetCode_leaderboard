@@ -10,12 +10,238 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup auto-refresh functionality
     setupAutoRefresh();
     
+    // Setup real-time data fetching
+    setupLiveDataFetching();
+    
     // Setup tooltips and popovers
     setupBootstrapComponents();
     
     // Setup dynamic interactions
     setupDynamicInteractions();
 });
+
+function setupLiveDataFetching() {
+    // Add a refresh button to the navbar
+    const navbar = document.querySelector('.navbar-nav');
+    if (navbar) {
+        const refreshItem = document.createElement('li');
+        refreshItem.className = 'nav-item';
+        refreshItem.innerHTML = `
+            <button class="nav-link btn btn-link" id="refreshDataBtn" onclick="fetchLiveData()">
+                <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                <span class="d-none d-md-inline ms-1">Refresh Data</span>
+            </button>
+        `;
+        navbar.appendChild(refreshItem);
+    }
+    
+    // Automatically fetch fresh data when page loads (only on main page)
+    if (window.location.pathname === '/' || window.location.pathname === '') {
+        // Add loading indicator
+        showLoadingState();
+        
+        // Fetch fresh data after a short delay
+        setTimeout(() => {
+            fetchLiveData(true); // true = silent mode (no toast)
+        }, 1000);
+    }
+}
+
+function fetchLiveData(silent = false) {
+    const refreshIcon = document.getElementById('refreshIcon');
+    const refreshBtn = document.getElementById('refreshDataBtn');
+    
+    if (!silent) {
+        showToast('Fetching fresh LeetCode data...', 'info');
+    }
+    
+    // Add spinning animation to refresh icon
+    if (refreshIcon) {
+        refreshIcon.classList.add('fa-spin');
+    }
+    
+    if (refreshBtn) {
+        refreshBtn.disabled = true;
+    }
+    
+    // Show loading state on leaderboard
+    showLoadingState();
+    
+    fetch('/api/live-data')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the leaderboard with fresh data
+                updateLeaderboardDisplay(data.leaderboard, data.stats);
+                
+                if (!silent) {
+                    const updatedCount = data.updated_users ? data.updated_users.length : 0;
+                    const failedCount = data.failed_users ? data.failed_users.length : 0;
+                    
+                    let message = `Updated ${updatedCount} users successfully!`;
+                    if (failedCount > 0) {
+                        message += ` (${failedCount} failed)`;
+                    }
+                    
+                    showToast(message, failedCount > 0 ? 'warning' : 'success');
+                }
+                
+                // Update last updated time
+                updateLastUpdatedTime(data.timestamp);
+                
+            } else {
+                if (!silent) {
+                    showToast('Failed to fetch fresh data: ' + data.message, 'error');
+                }
+                console.error('Live data fetch failed:', data.message);
+            }
+        })
+        .catch(error => {
+            if (!silent) {
+                showToast('Error fetching live data. Please try again.', 'error');
+            }
+            console.error('Error fetching live data:', error);
+        })
+        .finally(() => {
+            // Remove loading states
+            hideLoadingState();
+            
+            if (refreshIcon) {
+                refreshIcon.classList.remove('fa-spin');
+            }
+            
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+            }
+        });
+}
+
+function updateLeaderboardDisplay(leaderboard, stats) {
+    // Update the main leaderboard table
+    const tableBody = document.querySelector('#leaderboard-table tbody');
+    if (tableBody && leaderboard) {
+        // Clear existing rows
+        tableBody.innerHTML = '';
+        
+        // Add new rows
+        leaderboard.forEach((user, index) => {
+            const row = createLeaderboardRow(user, index + 1);
+            tableBody.appendChild(row);
+        });
+        
+        // Re-apply animations and interactions
+        setupTableInteractions();
+    }
+    
+    // Update stats cards
+    if (stats) {
+        updateStatsCards(stats);
+    }
+}
+
+function createLeaderboardRow(user, position) {
+    const row = document.createElement('tr');
+    row.className = 'slide-in-left';
+    row.style.animationDelay = `${position * 0.05}s`;
+    
+    // Position emoji
+    let positionEmoji = position <= 3 ? 
+        ['🥇', '🥈', '🥉'][position - 1] : 
+        `${position}.`;
+    
+    // Activity indicator
+    const weeklyTotal = user.weekly_total || 0;
+    let activity = weeklyTotal >= 10 ? '🔥 Very Active' :
+                   weeklyTotal >= 5 ? '✅ Active' :
+                   weeklyTotal >= 1 ? '⚡ Some' : '😴 Quiet';
+    
+    // Format ranking
+    const rankingStr = user.ranking > 0 ? `#${user.ranking.toLocaleString()}` : 'N/A';
+    
+    // Format last updated
+    let timeStr = 'Just now';
+    try {
+        const lastUpdated = new Date(user.last_updated);
+        timeStr = lastUpdated.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
+    } catch (e) {
+        timeStr = 'Unknown';
+    }
+    
+    row.innerHTML = `
+        <td><strong>${positionEmoji}</strong></td>
+        <td>
+            <a href="/user/${user.username}" class="text-decoration-none">
+                <strong>${user.username}</strong>
+            </a>
+        </td>
+        <td><strong>${user.weekly_base_score || 0}</strong></td>
+        <td>${user.weekly_easy || 0}/${user.weekly_medium || 0}/${user.weekly_hard || 0}</td>
+        <td><strong>${user.base_score || 0}</strong></td>
+        <td>${user.easy || 0}/${user.medium || 0}/${user.hard || 0}</td>
+        <td>${rankingStr}</td>
+        <td>${activity}</td>
+        <td>${timeStr}</td>
+    `;
+    
+    return row;
+}
+
+function updateStatsCards(stats) {
+    // Update various stats elements if they exist
+    const elements = {
+        'total-users': stats.total_users,
+        'weekly-problems': stats.weekly_problems,
+        'weekly-score': stats.weekly_score,
+        'avg-weekly-score': stats.avg_weekly_score
+    };
+    
+    Object.entries(elements).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element && value !== undefined) {
+            element.textContent = typeof value === 'number' ? value.toLocaleString() : value;
+        }
+    });
+    
+    // Update leader info if available
+    if (stats.leader) {
+        const leaderElement = document.getElementById('weekly-leader');
+        if (leaderElement) {
+            leaderElement.textContent = `${stats.leader.username} (${stats.leader.weekly_base_score || 0} pts)`;
+        }
+    }
+}
+
+function showLoadingState() {
+    const tableBody = document.querySelector('#leaderboard-table tbody');
+    if (tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading fresh data...</span>
+                    </div>
+                    <div class="mt-2">Fetching latest LeetCode data...</div>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function hideLoadingState() {
+    // Loading state will be replaced by updateLeaderboardDisplay
+}
+
+function updateLastUpdatedTime(timestamp) {
+    const timeElement = document.getElementById('last-updated-time');
+    if (timeElement) {
+        try {
+            const date = new Date(timestamp);
+            timeElement.textContent = date.toLocaleString();
+        } catch (e) {
+            timeElement.textContent = 'Just now';
+        }
+    }
+}
 
 function initializeApp() {
     console.log('🚀 Advanced LeetCode Leaderboard initialized');
@@ -371,3 +597,88 @@ document.addEventListener('keydown', function(e) {
         });
     }
 });
+
+// Utility Functions
+function showToast(message, type = 'info') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+    
+    // Create toast element
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'error' ? 'danger' : type}" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    
+    // Initialize and show toast
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: type === 'error' ? 7000 : 4000
+    });
+    
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+    });
+}
+
+function showConfirmDialog(title, message, type = 'danger', onConfirm) {
+    // Create modal if it doesn't exist
+    let confirmModal = document.getElementById('confirm-modal');
+    if (!confirmModal) {
+        const modalHtml = `
+            <div class="modal fade" id="confirm-modal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content bg-dark text-light">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirm-modal-title"></h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="confirm-modal-body"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn" id="confirm-modal-confirm">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        confirmModal = document.getElementById('confirm-modal');
+    }
+    
+    // Update modal content
+    document.getElementById('confirm-modal-title').textContent = title;
+    document.getElementById('confirm-modal-body').textContent = message;
+    
+    const confirmButton = document.getElementById('confirm-modal-confirm');
+    confirmButton.className = `btn btn-${type}`;
+    confirmButton.textContent = 'Confirm';
+    
+    // Set up confirm handler
+    confirmButton.onclick = function() {
+        if (onConfirm) onConfirm();
+        bootstrap.Modal.getInstance(confirmModal).hide();
+    };
+    
+    // Show modal
+    new bootstrap.Modal(confirmModal).show();
+}

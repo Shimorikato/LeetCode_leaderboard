@@ -609,6 +609,97 @@ def api_refresh_all():
             else:
                 failed_users.append(username)
         
+        result = {
+            'success': True,
+            'updated_count': updated_count,
+            'total_users': len(leaderboard.users),
+            'message': f'Updated {updated_count} users successfully!'
+        }
+        
+        if failed_users:
+            result['failed_users'] = failed_users
+            result['message'] += f' Failed to update: {", ".join(failed_users)}'
+        
+        return jsonify(result)
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+@app.route('/api/live-data')
+def api_live_data():
+    """API endpoint to get fresh LeetCode data - refreshes on every call."""
+    try:
+        # Define usernames to track (you can modify this list)
+        usernames = ['aayush17sty', 'lvuyfpznia', 'tanishq_kochar']
+        
+        # Create a temporary leaderboard instance for fresh data
+        live_leaderboard = LeetCodeLeaderboard("web_leaderboard_data.json")
+        
+        # Fetch fresh data for each user
+        updated_users = []
+        failed_users = []
+        
+        for username in usernames:
+            print(f"Fetching fresh data for {username}...")
+            success = live_leaderboard.add_user(username)
+            if success:
+                updated_users.append(username)
+                print(f"✅ Updated {username}")
+            else:
+                failed_users.append(username)
+                print(f"❌ Failed to update {username}")
+        
+        # Get the leaderboard data
+        leaderboard_data = live_leaderboard.get_leaderboard('weekly_base_score')
+        
+        # Calculate summary stats
+        stats = {}
+        if leaderboard_data:
+            total_weekly_problems = sum(user.get('weekly_total', 0) for user in leaderboard_data)
+            total_weekly_score = sum(user.get('weekly_base_score', 0) for user in leaderboard_data)
+            avg_weekly_score = total_weekly_score / len(leaderboard_data) if leaderboard_data else 0
+            
+            stats = {
+                'total_users': len(leaderboard_data),
+                'total_problems': sum(user.get('total_solved', 0) for user in leaderboard_data),
+                'weekly_problems': total_weekly_problems,
+                'weekly_score': total_weekly_score,
+                'avg_weekly_score': round(avg_weekly_score, 1),
+                'leader': leaderboard_data[0] if leaderboard_data else None,
+                'last_updated': datetime.now().isoformat()
+            }
+        
+        return jsonify({
+            'success': True,
+            'leaderboard': leaderboard_data,
+            'stats': stats,
+            'updated_users': updated_users,
+            'failed_users': failed_users,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        print(f"Error in live data endpoint: {e}")
+        return jsonify({
+            'success': False, 
+            'message': f'Error fetching live data: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/refresh_all', methods=['POST'])
+def api_refresh_all_old():
+    """API endpoint to refresh all users' data."""
+    try:
+        updated_count = 0
+        failed_users = []
+        
+        for username in leaderboard.users.keys():
+            success = leaderboard.add_user(username)
+            if success:
+                updated_count += 1
+            else:
+                failed_users.append(username)
+        
         message = f'Updated {updated_count} users successfully!'
         if failed_users:
             message += f' Failed to update: {", ".join(failed_users)}'
