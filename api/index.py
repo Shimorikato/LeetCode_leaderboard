@@ -367,6 +367,59 @@ except ImportError:
             
             return leaderboard
 
+def update_vercel_env_var(token: str, project_id: str, key: str, value: str) -> bool:
+    """Update Vercel environment variable."""
+    try:
+        # First, try to delete existing variable
+        delete_vercel_env_var(token, project_id, key)
+        
+        # Create new variable
+        url = f"https://api.vercel.com/v9/projects/{project_id}/env"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        
+        data = {
+            "key": key,
+            "value": value,
+            "type": "encrypted",
+            "target": ["production", "preview", "development"]
+        }
+        
+        response = requests.post(url, headers=headers, json=data, timeout=10)
+        response.raise_for_status()
+        return True
+        
+    except Exception as e:
+        print(f"Error updating Vercel env var: {e}")
+        return False
+
+def delete_vercel_env_var(token: str, project_id: str, key: str):
+    """Delete existing Vercel environment variable."""
+    try:
+        # Get existing environment variables
+        url = f"https://api.vercel.com/v9/projects/{project_id}/env"
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        env_vars = response.json()
+        
+        # Find and delete existing variable
+        for env_var in env_vars.get('envs', []):
+            if env_var.get('key') == key:
+                env_id = env_var.get('id')
+                delete_url = f"https://api.vercel.com/v9/projects/{project_id}/env/{env_id}"
+                
+                delete_response = requests.delete(delete_url, headers=headers, timeout=10)
+                delete_response.raise_for_status()
+                print(f"🗑️ Deleted old environment variable: {key}")
+                break
+                
+    except Exception:
+        pass  # Ignore deletion errors
+
 app = Flask(__name__, 
            template_folder='../templates',
            static_folder='../static')
@@ -627,21 +680,21 @@ def api_refresh_all():
 
 @app.route('/api/live-data')
 def api_live_data():
-    """API endpoint to get fresh LeetCode data - refreshes on every call."""
+    """API endpoint to get fresh LeetCode data - refreshes on every call and saves to JSON files."""
     try:
         # Define usernames to track (you can modify this list)
         usernames = ['aayush17sty', 'lvuyfpznia', 'tanishq_kochar']
         
-        # Create a temporary leaderboard instance for fresh data
-        live_leaderboard = LeetCodeLeaderboard("web_leaderboard_data.json")
+        # Use the global leaderboard instance instead of creating a temporary one
+        global leaderboard
         
-        # Fetch fresh data for each user
+        # Fetch fresh data for each user and save to files
         updated_users = []
         failed_users = []
         
         for username in usernames:
             print(f"Fetching fresh data for {username}...")
-            success = live_leaderboard.add_user(username)
+            success = leaderboard.add_user(username)  # This will save to both JSON files
             if success:
                 updated_users.append(username)
                 print(f"✅ Updated {username}")
@@ -649,8 +702,69 @@ def api_live_data():
                 failed_users.append(username)
                 print(f"❌ Failed to update {username}")
         
-        # Get the leaderboard data
-        leaderboard_data = live_leaderboard.get_leaderboard('weekly_base_score')
+        # Force save to ensure data is persisted
+        leaderboard.save_data()
+        
+        # Trigger GitHub Action to update repository files
+        try:
+            github_token = os.environ.get('GITHUB_TOKEN')
+            if github_token:
+                print("🔄 Triggering GitHub Action to update repository...")
+                
+                # Trigger repository_dispatch event
+                dispatch_url = "https://api.github.com/repos/Shimorikato/LeetCode_leaderboard/dispatches"
+                headers = {
+                    "Authorization": f"Bearer {github_token}",
+                    "Accept": "application/vnd.github.v3+json",
+                    "Content-Type": "application/json"
+                }
+                
+                payload = {
+                    "event_type": "update-leaderboard",
+                    "client_payload": {
+                        "updated_users": updated_users,
+                        "timestamp": datetime.now().isoformat()
+                    }
+                }
+                
+                response = requests.post(dispatch_url, headers=headers, json=payload, timeout=10)
+                if response.status_code == 204:
+                    print("✅ GitHub Action triggered successfully")
+                else:
+                    print(f"⚠️ GitHub Action trigger failed: {response.status_code}")
+            else:
+                print("ℹ️ GitHub token not available, skipping repository update")
+                
+        except Exception as github_error:
+            print(f"⚠️ GitHub Action trigger failed: {github_error}")
+        
+        # Update Vercel environment variable if tokens are available
+        try:
+            import base64
+            vercel_token = os.environ.get('VERCEL_TOKEN')
+            project_id = os.environ.get('VERCEL_PROJECT_ID')
+            
+            if vercel_token and project_id:
+                print("🔄 Updating Vercel environment variable...")
+                
+                # Encode the fresh data
+                json_str = json.dumps(leaderboard.users, separators=(',', ':'))
+                encoded_data = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
+                
+                # Update Vercel environment variable
+                update_success = update_vercel_env_var(vercel_token, project_id, 'LEADERBOARD_DATA_B64', encoded_data)
+                if update_success:
+                    print("✅ Vercel environment variable updated successfully")
+                else:
+                    print("⚠️ Failed to update Vercel environment variable")
+            else:
+                print("ℹ️ Vercel credentials not available, skipping environment update")
+                
+        except Exception as vercel_error:
+            print(f"⚠️ Vercel update failed: {vercel_error}")
+        
+        # Get the updated leaderboard data
+        leaderboard_data = leaderboard.get_leaderboard('weekly_base_score')
         
         # Calculate summary stats
         stats = {}

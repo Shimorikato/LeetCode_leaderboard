@@ -1,0 +1,73 @@
+name: Update Leaderboard Data
+
+on:
+  repository_dispatch:
+    types: [update-leaderboard]
+  workflow_dispatch:
+  schedule:
+    # Run every 2 hours during active hours (8 AM to 10 PM UTC)
+    - cron: '0 8-22/2 * * *'
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Update LeetCode data
+      run: |
+        echo "🔄 Fetching fresh LeetCode data..."
+        python leetcode_leaderboard.py --update-all --batch
+    
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "📝 Changes detected in data files"
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ No changes in data files"
+        fi
+    
+    - name: Commit and push changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "LeetCode Leaderboard Bot"
+        
+        # Add only the JSON data files
+        git add leaderboard_data.json web_leaderboard_data.json
+        
+        # Create commit with timestamp
+        TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
+        git commit -m "🔄 Auto-update leaderboard data ($TIMESTAMP)"
+        
+        # Push changes
+        git push origin main
+        
+        echo "✅ Successfully updated leaderboard data"
+    
+    - name: Generate environment variable for Vercel
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      run: |
+        echo "🔐 Updating Vercel environment variable..."
+        python manual_vercel_update.py
