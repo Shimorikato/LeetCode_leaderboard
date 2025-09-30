@@ -3,11 +3,6 @@ name: Auto Deploy to Vercel
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'web_leaderboard_data.json'
-      - 'leaderboard_data.json'
-      - 'api/**'
-      - 'templates/**'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
@@ -28,37 +23,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests
     
-    - name: Generate environment variable
-      run: |
-        python auto_deploy.py > env_output.txt
-        # Extract base64 data from output
-        grep -A 1 "eyJ" env_output.txt | head -1 > base64_data.txt
-    
-    - name: Update Vercel Environment Variable
+    - name: Update LeetCode data and deploy to Vercel
       env:
         VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       run: |
-        # Read the base64 data
-        BASE64_DATA=$(cat base64_data.txt)
+        # First update the local data
+        python leetcode_leaderboard.py --update-all --batch
         
-        # Update environment variable via Vercel API
-        curl -X POST \
-          "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env" \
-          -H "Authorization: Bearer $VERCEL_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d "{
-            \"key\": \"LEADERBOARD_DATA_B64\",
-            \"value\": \"$BASE64_DATA\",
-            \"type\": \"encrypted\",
-            \"target\": [\"production\", \"preview\", \"development\"]
-          }"
-    
-    - name: Trigger Vercel Deployment
-      env:
-        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      run: |
-        curl -X POST \
-          "https://api.vercel.com/v1/integrations/deploy/prj_$VERCEL_PROJECT_ID/ACmE8uRaVR4" \
-          -H "Authorization: Bearer $VERCEL_TOKEN"
+        # Then run our auto deploy script
+        python auto_deploy.py

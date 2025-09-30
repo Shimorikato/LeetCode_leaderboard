@@ -714,9 +714,18 @@ class LeetCodeLeaderboard:
 
 def main():
     """Main application with command-line interface."""
+    import sys
+    
+    # Check for batch mode (for GitHub Actions)
+    if len(sys.argv) > 1 and '--update-all' in sys.argv and '--batch' in sys.argv:
+        print("🔄 Running in batch mode for automation...")
+        leaderboard = LeetCodeLeaderboard()
+        leaderboard.update_all_users()
+        return
+    
     leaderboard = LeetCodeLeaderboard()
     
-    print("�️ Welcome to Weekly LeetCode Leaderboard!")
+    print("🛝️ Welcome to Weekly LeetCode Leaderboard!")
     print("   Compare your weekly progress with friends")
     
     while True:
