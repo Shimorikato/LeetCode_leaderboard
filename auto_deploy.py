@@ -159,13 +159,28 @@ class VercelAutoDeployer:
             print("Environment Variable Value:")
             print(encoded_data)
             print("="*60)
-            print("\n📝 To automate this process:")
+            
+            # Show user scores for verification
+            print("\n� Current scores:")
+            for username, user_data in data.items():
+                real_name = user_data.get('real_name', username)
+                base_score = user_data.get('base_score', 0)
+                weekly_score = user_data.get('weekly_base_score', 0)
+                print(f"  • {real_name}: {base_score} points (Weekly: {weekly_score})")
+            
+            print("\n�📝 To automate this process:")
             print("1. Get your Vercel token: https://vercel.com/account/tokens")
             print("2. Get your project ID from Vercel dashboard")
             print("3. Set environment variables:")
             print("   export VERCEL_TOKEN=your_token_here")
             print("   export VERCEL_PROJECT_ID=your_project_id_here")
             print("4. Run this script again")
+            
+            # For GitHub Actions, this is still considered success since data was updated
+            if os.getenv('GITHUB_ACTIONS'):
+                print("\n🔄 Running in GitHub Actions - manual Vercel update required")
+                print("✅ LeetCode data updated successfully! Manual Vercel update needed.")
+                return True
             return False
         
         # Update environment variable
