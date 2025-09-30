@@ -1,0 +1,64 @@
+name: Auto Deploy to Vercel
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'web_leaderboard_data.json'
+      - 'leaderboard_data.json'
+      - 'api/**'
+      - 'templates/**'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Generate environment variable
+      run: |
+        python auto_deploy.py > env_output.txt
+        # Extract base64 data from output
+        grep -A 1 "eyJ" env_output.txt | head -1 > base64_data.txt
+    
+    - name: Update Vercel Environment Variable
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      run: |
+        # Read the base64 data
+        BASE64_DATA=$(cat base64_data.txt)
+        
+        # Update environment variable via Vercel API
+        curl -X POST \
+          "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env" \
+          -H "Authorization: Bearer $VERCEL_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "{
+            \"key\": \"LEADERBOARD_DATA_B64\",
+            \"value\": \"$BASE64_DATA\",
+            \"type\": \"encrypted\",
+            \"target\": [\"production\", \"preview\", \"development\"]
+          }"
+    
+    - name: Trigger Vercel Deployment
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      run: |
+        curl -X POST \
+          "https://api.vercel.com/v1/integrations/deploy/prj_$VERCEL_PROJECT_ID/ACmE8uRaVR4" \
+          -H "Authorization: Bearer $VERCEL_TOKEN"
