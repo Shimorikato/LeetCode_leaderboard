@@ -356,11 +356,18 @@ class LeetCodeLeaderboard:
             self.users = {}
     
     def save_data(self) -> None:
-        """Save current user data to JSON file."""
+        """Save current user data to JSON file and sync with web version."""
         try:
+            # Save to main data file
             with open(self.data_file, 'w') as f:
                 json.dump(self.users, f, indent=2)
-            print(f"💾 Data saved successfully")
+            
+            # Also save to web_leaderboard_data.json for Vercel deployment
+            web_data_file = "web_leaderboard_data.json"
+            with open(web_data_file, 'w') as f:
+                json.dump(self.users, f, indent=2)
+            
+            print(f"💾 Data saved to {self.data_file} and {web_data_file}")
         except Exception as e:
             print(f"❌ Error saving data: {e}")
     
