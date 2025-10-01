@@ -63,11 +63,20 @@ jobs:
         
         echo "✅ Successfully updated leaderboard data"
     
-    - name: Generate environment variable for Vercel
+    - name: Generate environment variable for Vercel (optional)
       if: steps.verify-changed-files.outputs.changed == 'true'
-      env:
-        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      continue-on-error: true
       run: |
-        echo "🔐 Updating Vercel environment variable..."
-        python manual_vercel_update.py
+        echo "🔐 Generating environment variable for Vercel..."
+        
+        # Check if the required files exist
+        if [ ! -f "manual_vercel_update.py" ]; then
+          echo "⚠️ manual_vercel_update.py not found, skipping Vercel update"
+          exit 0
+        fi
+        
+        # Run the Vercel update script
+        python manual_vercel_update.py || echo "⚠️ Vercel update script failed, but continuing..."
+        
+        echo "📋 Note: Manual Vercel dashboard update may be required"
+        echo "🔗 Visit https://vercel.com/dashboard to update environment variables if needed"
