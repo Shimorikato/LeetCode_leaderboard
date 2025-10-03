@@ -2,7 +2,7 @@
   "aayush17sty": {
     "username": "Aayush17sty",
     "real_name": "Aayush",
-    "ranking": 1565161,
+    "ranking": 1538705,
     "total_solved": 82,
     "easy": 50,
     "medium": 30,
@@ -156,8 +156,8 @@
         "url": "/submissions/detail/1786665461/"
       }
     ],
-    "submission_calendar": "{\"1738022400\": 1, \"1738368000\": 3, \"1738627200\": 11, \"1738713600\": 4, \"1741737600\": 1, \"1743206400\": 2, \"1750377600\": 2, \"1750464000\": 15, \"1750809600\": 1, \"1751673600\": 8, \"1751760000\": 5, \"1751846400\": 6, \"1751932800\": 1, \"1752019200\": 1, \"1752105600\": 2, \"1752364800\": 2, \"1753574400\": 1, \"1753747200\": 4, \"1753833600\": 1, \"1753920000\": 6, \"1754006400\": 4, \"1754179200\": 2, \"1754265600\": 6, \"1754352000\": 7, \"1754784000\": 3, \"1754870400\": 3, \"1754956800\": 3, \"1755043200\": 1, \"1755129600\": 1, \"1755475200\": 5, \"1755561600\": 4, \"1755648000\": 1, \"1755734400\": 2, \"1755820800\": 5, \"1755907200\": 7, \"1755993600\": 4, \"1756080000\": 1, \"1756166400\": 5, \"1756425600\": 7, \"1756512000\": 1, \"1756684800\": 1, \"1756771200\": 1, \"1756857600\": 2, \"1756944000\": 1, \"1757030400\": 2, \"1757116800\": 1, \"1758067200\": 2, \"1758499200\": 1, \"1758672000\": 3, \"1758931200\": 11, \"1759104000\": 16, \"1759190400\": 3, \"1727740800\": 1, \"1727827200\": 1, \"1728000000\": 3, \"1729814400\": 6, \"1729900800\": 1, \"1730073600\": 2, \"1730160000\": 3, \"1731196800\": 1, \"1734912000\": 1}",
-    "last_updated": "2025-10-01T00:00:55.880208",
+    "submission_calendar": "{\"1738022400\": 1, \"1738368000\": 3, \"1738627200\": 11, \"1738713600\": 4, \"1741737600\": 1, \"1743206400\": 2, \"1750377600\": 2, \"1750464000\": 15, \"1750809600\": 1, \"1751673600\": 8, \"1751760000\": 5, \"1751846400\": 6, \"1751932800\": 1, \"1752019200\": 1, \"1752105600\": 2, \"1752364800\": 2, \"1753574400\": 1, \"1753747200\": 4, \"1753833600\": 1, \"1753920000\": 6, \"1754006400\": 4, \"1754179200\": 2, \"1754265600\": 6, \"1754352000\": 7, \"1754784000\": 3, \"1754870400\": 3, \"1754956800\": 3, \"1755043200\": 1, \"1755129600\": 1, \"1755475200\": 5, \"1755561600\": 4, \"1755648000\": 1, \"1755734400\": 2, \"1755820800\": 5, \"1755907200\": 7, \"1755993600\": 4, \"1756080000\": 1, \"1756166400\": 5, \"1756425600\": 7, \"1756512000\": 1, \"1756684800\": 1, \"1756771200\": 1, \"1756857600\": 2, \"1756944000\": 1, \"1757030400\": 2, \"1757116800\": 1, \"1758067200\": 2, \"1758499200\": 1, \"1758672000\": 3, \"1758931200\": 11, \"1759104000\": 16, \"1759190400\": 3, \"1728000000\": 3, \"1729814400\": 6, \"1729900800\": 1, \"1730073600\": 2, \"1730160000\": 3, \"1731196800\": 1, \"1734912000\": 1}",
+    "last_updated": "2025-10-03T09:14:38.117184",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -168,24 +168,24 @@
   "lvuyfpznia": {
     "username": "LvuYfPzniA",
     "real_name": "LvuYfPzniA",
-    "ranking": 3274854,
-    "total_solved": 26,
-    "easy": 23,
+    "ranking": 2921200,
+    "total_solved": 30,
+    "easy": 27,
     "medium": 2,
     "hard": 1,
-    "base_score": 36,
-    "weekly_total": 11,
-    "weekly_easy": 11,
-    "weekly_medium": 0,
+    "base_score": 40,
+    "weekly_total": 23,
+    "weekly_easy": 22,
+    "weekly_medium": 1,
     "weekly_hard": 0,
-    "weekly_base_score": 11,
+    "weekly_base_score": 25,
     "current_week": "2025-09-29 to 2025-10-05",
     "languages": {
       "Java": 4,
-      "Python3": 22
+      "Python3": 26
     },
     "topics": {
-      "Array": 10,
+      "Array": 11,
       "Matrix": 1,
       "String": 8,
       "Simulation": 1,
@@ -193,124 +193,125 @@
       "Stack": 2,
       "Linked List": 3,
       "Two Pointers": 4,
-      "Tree": 4,
-      "Binary Tree": 4,
+      "Tree": 8,
+      "Binary Tree": 8,
       "Hash Table": 6,
       "Binary Search": 1,
-      "Depth-First Search": 4,
-      "Breadth-First Search": 3,
+      "Depth-First Search": 7,
+      "Breadth-First Search": 5,
       "Recursion": 2,
       "Sliding Window": 1,
       "Bit Manipulation": 1,
       "Math": 6,
       "Backtracking": 1,
       "Dynamic Programming": 2,
+      "Divide and Conquer": 1,
       "Trie": 1
     },
     "recent_submissions": [
       {
-        "title": "Maximum Depth of Binary Tree",
-        "titleSlug": "maximum-depth-of-binary-tree",
-        "timestamp": "1759245824",
+        "title": "Path Sum",
+        "titleSlug": "path-sum",
+        "timestamp": "1759361361",
         "statusDisplay": "Accepted",
         "lang": "python3",
         "runtime": "0 ms",
-        "memory": "19.2 MB",
-        "url": "/submissions/detail/1787363099/"
-      },
-      {
-        "title": "Maximum Depth of Binary Tree",
-        "titleSlug": "maximum-depth-of-binary-tree",
-        "timestamp": "1759245816",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "3 ms",
         "memory": "18.9 MB",
-        "url": "/submissions/detail/1787363020/"
+        "url": "/submissions/detail/1788689179/"
       },
       {
-        "title": "Symmetric Tree",
-        "titleSlug": "symmetric-tree",
-        "timestamp": "1759245508",
+        "title": "Minimum Depth of Binary Tree",
+        "titleSlug": "minimum-depth-of-binary-tree",
+        "timestamp": "1759359308",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "42 ms",
+        "memory": "50.4 MB",
+        "url": "/submissions/detail/1788676998/"
+      },
+      {
+        "title": "Minimum Depth of Binary Tree",
+        "titleSlug": "minimum-depth-of-binary-tree",
+        "timestamp": "1759359301",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "40 ms",
+        "memory": "50.5 MB",
+        "url": "/submissions/detail/1788676951/"
+      },
+      {
+        "title": "Balanced Binary Tree",
+        "titleSlug": "balanced-binary-tree",
+        "timestamp": "1759273034",
         "statusDisplay": "Accepted",
         "lang": "python3",
         "runtime": "0 ms",
-        "memory": "17.8 MB",
-        "url": "/submissions/detail/1787358687/"
+        "memory": "18.7 MB",
+        "url": "/submissions/detail/1787693764/"
       },
       {
-        "title": "Symmetric Tree",
-        "titleSlug": "symmetric-tree",
-        "timestamp": "1759245485",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "3 ms",
-        "memory": "17.7 MB",
-        "url": "/submissions/detail/1787358369/"
-      },
-      {
-        "title": "Symmetric Tree",
-        "titleSlug": "symmetric-tree",
-        "timestamp": "1759188164",
+        "title": "Balanced Binary Tree",
+        "titleSlug": "balanced-binary-tree",
+        "timestamp": "1759272657",
         "statusDisplay": "Wrong Answer",
         "lang": "python3",
         "runtime": "N/A",
         "memory": "N/A",
-        "url": "/submissions/detail/1786720203/"
+        "url": "/submissions/detail/1787691527/"
       },
       {
-        "title": "Same Tree",
-        "titleSlug": "same-tree",
-        "timestamp": "1759187486",
+        "title": "Balanced Binary Tree",
+        "titleSlug": "balanced-binary-tree",
+        "timestamp": "1759272530",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1787690679/"
+      },
+      {
+        "title": "Balanced Binary Tree",
+        "titleSlug": "balanced-binary-tree",
+        "timestamp": "1759272286",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1787689145/"
+      },
+      {
+        "title": "Balanced Binary Tree",
+        "titleSlug": "balanced-binary-tree",
+        "timestamp": "1759272244",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1787688889/"
+      },
+      {
+        "title": "Balanced Binary Tree",
+        "titleSlug": "balanced-binary-tree",
+        "timestamp": "1759272056",
+        "statusDisplay": "Wrong Answer",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1787687733/"
+      },
+      {
+        "title": "Convert Sorted Array to Binary Search Tree",
+        "titleSlug": "convert-sorted-array-to-binary-search-tree",
+        "timestamp": "1759271510",
         "statusDisplay": "Accepted",
         "lang": "python3",
         "runtime": "0 ms",
-        "memory": "17.9 MB",
-        "url": "/submissions/detail/1786716181/"
-      },
-      {
-        "title": "Binary Tree Inorder Traversal",
-        "titleSlug": "binary-tree-inorder-traversal",
-        "timestamp": "1759183876",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "0 ms",
-        "memory": "17.7 MB",
-        "url": "/submissions/detail/1786693613/"
-      },
-      {
-        "title": "Merge Sorted Array",
-        "titleSlug": "merge-sorted-array",
-        "timestamp": "1759183320",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "0 ms",
-        "memory": "18.1 MB",
-        "url": "/submissions/detail/1786689974/"
-      },
-      {
-        "title": "Remove Duplicates from Sorted List",
-        "titleSlug": "remove-duplicates-from-sorted-list",
-        "timestamp": "1759181792",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "0 ms",
-        "memory": "17.9 MB",
-        "url": "/submissions/detail/1786678989/"
-      },
-      {
-        "title": "Min Cost Climbing Stairs",
-        "titleSlug": "min-cost-climbing-stairs",
-        "timestamp": "1759107649",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "0 ms",
-        "memory": "17.9 MB",
-        "url": "/submissions/detail/1785798310/"
+        "memory": "18.9 MB",
+        "url": "/submissions/detail/1787684311/"
       }
     ],
-    "submission_calendar": "{\"1747440000\": 2, \"1747612800\": 2, \"1748131200\": 1, \"1754438400\": 1, \"1754611200\": 8, \"1754870400\": 4, \"1754956800\": 1, \"1755907200\": 11, \"1756598400\": 6, \"1758240000\": 2, \"1758326400\": 3, \"1758931200\": 2, \"1759017600\": 1, \"1759104000\": 7, \"1759190400\": 4}",
-    "last_updated": "2025-10-01T00:00:58.076664",
+    "submission_calendar": "{\"1747440000\": 2, \"1747612800\": 2, \"1748131200\": 1, \"1754438400\": 1, \"1754611200\": 8, \"1754870400\": 4, \"1754956800\": 1, \"1755907200\": 11, \"1756598400\": 6, \"1758240000\": 2, \"1758326400\": 3, \"1758931200\": 2, \"1759017600\": 1, \"1759104000\": 7, \"1759190400\": 13, \"1759276800\": 3}",
+    "last_updated": "2025-10-03T09:14:40.021033",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -321,27 +322,27 @@
   "tanishq_kochar": {
     "username": "Tanishq_Kochar",
     "real_name": "Krasky",
-    "ranking": 3140136,
-    "total_solved": 26,
-    "easy": 15,
-    "medium": 8,
+    "ranking": 3026545,
+    "total_solved": 28,
+    "easy": 16,
+    "medium": 9,
     "hard": 3,
-    "base_score": 60,
-    "weekly_total": 0,
-    "weekly_easy": 0,
-    "weekly_medium": 0,
+    "base_score": 64,
+    "weekly_total": 4,
+    "weekly_easy": 3,
+    "weekly_medium": 1,
     "weekly_hard": 0,
-    "weekly_base_score": 0,
+    "weekly_base_score": 6,
     "current_week": "2025-09-29 to 2025-10-05",
     "languages": {
-      "C++": 25,
+      "C++": 27,
       "JavaScript": 1
     },
     "topics": {
       "Array": 19,
       "Matrix": 1,
       "String": 3,
-      "Simulation": 2,
+      "Simulation": 4,
       "Enumeration": 2,
       "Sorting": 3,
       "Stack": 1,
@@ -352,13 +353,53 @@
       "Recursion": 1,
       "Sliding Window": 1,
       "Bit Manipulation": 5,
-      "Math": 3,
+      "Math": 5,
       "Backtracking": 3,
       "Dynamic Programming": 3,
       "Divide and Conquer": 3,
       "Monotonic Stack": 1
     },
     "recent_submissions": [
+      {
+        "title": "Water Bottles II",
+        "titleSlug": "water-bottles-ii",
+        "timestamp": "1759376577",
+        "statusDisplay": "Accepted",
+        "lang": "cpp",
+        "runtime": "5 ms",
+        "memory": "8.5 MB",
+        "url": "/submissions/detail/1788798245/"
+      },
+      {
+        "title": "Water Bottles II",
+        "titleSlug": "water-bottles-ii",
+        "timestamp": "1759376566",
+        "statusDisplay": "Accepted",
+        "lang": "cpp",
+        "runtime": "2 ms",
+        "memory": "8.6 MB",
+        "url": "/submissions/detail/1788798117/"
+      },
+      {
+        "title": "Water Bottles II",
+        "titleSlug": "water-bottles-ii",
+        "timestamp": "1759376466",
+        "statusDisplay": "Accepted",
+        "lang": "cpp",
+        "runtime": "6 ms",
+        "memory": "8.6 MB",
+        "url": "/submissions/detail/1788797172/"
+      },
+      {
+        "title": "Water Bottles",
+        "titleSlug": "water-bottles",
+        "timestamp": "1759347107",
+        "statusDisplay": "Accepted",
+        "lang": "cpp",
+        "runtime": "0 ms",
+        "memory": "7.8 MB",
+        "url": "/submissions/detail/1788574263/"
+      },
       {
         "title": "Palindrome Number",
         "titleSlug": "palindrome-number",
@@ -418,50 +459,10 @@
         "runtime": "177 ms",
         "memory": "132.5 MB",
         "url": "/submissions/detail/1655529665/"
-      },
-      {
-        "title": "Count Primes",
-        "titleSlug": "count-primes",
-        "timestamp": "1749201622",
-        "statusDisplay": "Accepted",
-        "lang": "cpp",
-        "runtime": "182 ms",
-        "memory": "132.4 MB",
-        "url": "/submissions/detail/1655529080/"
-      },
-      {
-        "title": "Maximum Amount of Money Robot Can Earn",
-        "titleSlug": "maximum-amount-of-money-robot-can-earn",
-        "timestamp": "1736654468",
-        "statusDisplay": "Compile Error",
-        "lang": "cpp",
-        "runtime": "N/A",
-        "memory": "N/A",
-        "url": "/submissions/detail/1505759577/"
-      },
-      {
-        "title": "Zigzag Grid Traversal With Skip",
-        "titleSlug": "zigzag-grid-traversal-with-skip",
-        "timestamp": "1736652366",
-        "statusDisplay": "Accepted",
-        "lang": "cpp",
-        "runtime": "0 ms",
-        "memory": "31.9 MB",
-        "url": "/submissions/detail/1505716076/"
-      },
-      {
-        "title": "Find Mirror Score of a String",
-        "titleSlug": "find-mirror-score-of-a-string",
-        "timestamp": "1736047016",
-        "statusDisplay": "Time Limit Exceeded",
-        "lang": "cpp",
-        "runtime": "N/A",
-        "memory": "N/A",
-        "url": "/submissions/detail/1498042595/"
       }
     ],
-    "submission_calendar": "{\"1736035200\": 7, \"1736640000\": 2, \"1749168000\": 2, \"1753142400\": 2, \"1758931200\": 3, \"1733356800\": 1, \"1733443200\": 2, \"1733529600\": 1, \"1733702400\": 6, \"1733961600\": 1}",
-    "last_updated": "2025-10-01T00:01:01.517196",
+    "submission_calendar": "{\"1736035200\": 7, \"1736640000\": 2, \"1749168000\": 2, \"1753142400\": 2, \"1758931200\": 3, \"1759276800\": 1, \"1759363200\": 3, \"1733356800\": 1, \"1733443200\": 2, \"1733529600\": 1, \"1733702400\": 6, \"1733961600\": 1}",
+    "last_updated": "2025-10-03T09:14:41.928776",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
