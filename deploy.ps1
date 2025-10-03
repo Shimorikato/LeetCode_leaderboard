@@ -19,7 +19,8 @@ Write-Host "`n📊 Updating user data..." -ForegroundColor Yellow
 try {
     python leetcode_leaderboard.py -c "update"  # If you add command line support
     Write-Host "✅ User data updated" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Host "⚠️ Could not update user data automatically" -ForegroundColor Yellow
 }
 
