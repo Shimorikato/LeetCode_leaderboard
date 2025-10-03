@@ -1,9 +1,10 @@
+# Version: 2025-10-03-v3 - Fixed authentication with git-auto-commit-action
 name: Update Leaderboard Data
 
 on:
   repository_dispatch:
     types: [update-leaderboard]
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger button in GitHub UI
   schedule:
     # Run every 2 hours during active hours (8 AM to 10 PM UTC)
     - cron: '0 8-22/2 * * *'
@@ -16,6 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Verify workflow version
+      run: |
+        echo "🔧 Using workflow version: 2025-10-03-v3"
+        echo "✅ This version uses git-auto-commit-action for authentication"
+        
     - name: Checkout code
       uses: actions/checkout@v4
       with:
