@@ -326,6 +326,9 @@ function initializeApp() {
     
     // Setup progress bar animations
     animateProgressBars();
+    
+    // Setup add user modal functionality
+    setupAddUserModal();
 }
 
 function addAnimations() {
@@ -753,4 +756,118 @@ function showConfirmDialog(title, message, type = 'danger', onConfirm) {
     
     // Show modal
     new bootstrap.Modal(confirmModal).show();
+}
+
+function setupAddUserModal() {
+    const addUserForm = document.getElementById('addUserForm');
+    if (!addUserForm) return; // Modal not present on this page
+    
+    addUserForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const usernameInput = document.getElementById('modalUsername');
+        const username = usernameInput.value.trim();
+        
+        if (!username) {
+            showToast('Please enter a username', 'warning');
+            return;
+        }
+        
+        addUserToLeaderboard(username);
+    });
+    
+    // Reset form when modal is closed
+    const modal = document.getElementById('addUserModal');
+    if (modal) {
+        modal.addEventListener('hidden.bs.modal', function() {
+            resetAddUserForm();
+        });
+    }
+}
+
+function addUserToLeaderboard(username) {
+    const progressDiv = document.getElementById('addUserProgress');
+    const resultDiv = document.getElementById('addUserResult');
+    const addUserBtn = document.getElementById('addUserBtn');
+    const usernameInput = document.getElementById('modalUsername');
+    
+    // Show progress
+    progressDiv.classList.remove('d-none');
+    resultDiv.innerHTML = '';
+    addUserBtn.disabled = true;
+    usernameInput.disabled = true;
+    
+    fetch('/api/add_user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: username })
+    })
+    .then(response => response.json())
+    .then(data => {
+        progressDiv.classList.add('d-none');
+        
+        if (data.success) {
+            // Show success message
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    ${data.message}
+                </div>
+            `;
+            
+            // Show success toast
+            showToast(`✅ ${username} added successfully!`, 'success');
+            
+            // Refresh the leaderboard to show the new user
+            setTimeout(() => {
+                fetchLiveData(true); // Silent refresh
+                
+                // Close modal after a short delay
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                    modal.hide();
+                }, 1500);
+            }, 1000);
+            
+        } else {
+            // Show error message
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    ${data.message}
+                </div>
+            `;
+            showToast(`❌ ${data.message}`, 'error');
+        }
+    })
+    .catch(error => {
+        progressDiv.classList.add('d-none');
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Failed to add user: ${error.message}
+            </div>
+        `;
+        showToast(`❌ Failed to add user: ${error.message}`, 'error');
+    })
+    .finally(() => {
+        addUserBtn.disabled = false;
+        usernameInput.disabled = false;
+    });
+}
+
+function resetAddUserForm() {
+    const form = document.getElementById('addUserForm');
+    const progressDiv = document.getElementById('addUserProgress');
+    const resultDiv = document.getElementById('addUserResult');
+    const addUserBtn = document.getElementById('addUserBtn');
+    const usernameInput = document.getElementById('modalUsername');
+    
+    if (form) form.reset();
+    if (progressDiv) progressDiv.classList.add('d-none');
+    if (resultDiv) resultDiv.innerHTML = '';
+    if (addUserBtn) addUserBtn.disabled = false;
+    if (usernameInput) usernameInput.disabled = false;
 }
