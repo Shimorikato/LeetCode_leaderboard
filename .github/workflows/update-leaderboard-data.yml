@@ -50,21 +50,13 @@ jobs:
     
     - name: Commit and push changes
       if: steps.verify-changed-files.outputs.changed == 'true'
-      run: |
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        
-        # Add only the JSON data files
-        git add leaderboard_data.json web_leaderboard_data.json
-        
-        # Create commit with timestamp
-        TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
-        git commit -m "🔄 Auto-update leaderboard data ($TIMESTAMP)"
-        
-        # Push changes using the GitHub token
-        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
-        
-        echo "✅ Successfully updated leaderboard data"
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: '🔄 Auto-update leaderboard data'
+        file_pattern: 'leaderboard_data.json web_leaderboard_data.json'
+        commit_user_name: 'github-actions[bot]'
+        commit_user_email: '41898282+github-actions[bot]@users.noreply.github.com'
+        commit_author: 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
     
     - name: Generate environment variable for Vercel (optional)
       if: steps.verify-changed-files.outputs.changed == 'true'
