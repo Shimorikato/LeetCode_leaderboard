@@ -21,18 +21,32 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function setupLiveDataFetching() {
-    // Add a refresh button to the navbar
+    // Add refresh buttons to the navbar
     const navbar = document.querySelector('.navbar-nav');
     if (navbar) {
-        const refreshItem = document.createElement('li');
-        refreshItem.className = 'nav-item';
-        refreshItem.innerHTML = `
-            <button class="nav-link btn btn-link" id="refreshDataBtn" onclick="fetchLiveData()">
+        const refreshContainer = document.createElement('li');
+        refreshContainer.className = 'nav-item dropdown';
+        refreshContainer.innerHTML = `
+            <button class="nav-link btn btn-link dropdown-toggle" id="refreshDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-sync-alt" id="refreshIcon"></i>
                 <span class="d-none d-md-inline ms-1">Refresh Data</span>
             </button>
+            <ul class="dropdown-menu" aria-labelledby="refreshDropdown">
+                <li><a class="dropdown-item" href="#" onclick="fetchLiveData()">
+                    <i class="fas fa-bolt text-warning me-2"></i>Quick Refresh
+                    <small class="text-muted d-block">Instant update from cache</small>
+                </a></li>
+                <li><a class="dropdown-item" href="#" onclick="triggerFullUpdate()">
+                    <i class="fas fa-cloud-download-alt text-primary me-2"></i>Full Update
+                    <small class="text-muted d-block">Fresh data from LeetCode (~2-3 min)</small>
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-muted" href="#">
+                    <i class="fas fa-clock me-2"></i>Auto-refresh: Every 2 hours
+                </a></li>
+            </ul>
         `;
-        navbar.appendChild(refreshItem);
+        navbar.appendChild(refreshContainer);
     }
     
     // Automatically fetch fresh data when page loads (only on main page)
@@ -49,7 +63,7 @@ function setupLiveDataFetching() {
 
 function fetchLiveData(silent = false) {
     const refreshIcon = document.getElementById('refreshIcon');
-    const refreshBtn = document.getElementById('refreshDataBtn');
+    const refreshDropdown = document.getElementById('refreshDropdown');
     
     if (!silent) {
         showToast('Fetching fresh LeetCode data...', 'info');
@@ -60,8 +74,8 @@ function fetchLiveData(silent = false) {
         refreshIcon.classList.add('fa-spin');
     }
     
-    if (refreshBtn) {
-        refreshBtn.disabled = true;
+    if (refreshDropdown) {
+        refreshDropdown.disabled = true;
     }
     
     // Show loading state on leaderboard
@@ -110,8 +124,66 @@ function fetchLiveData(silent = false) {
                 refreshIcon.classList.remove('fa-spin');
             }
             
-            if (refreshBtn) {
-                refreshBtn.disabled = false;
+            if (refreshDropdown) {
+                refreshDropdown.disabled = false;
+            }
+        });
+}
+
+function triggerFullUpdate() {
+    const refreshIcon = document.getElementById('refreshIcon');
+    const refreshDropdown = document.getElementById('refreshDropdown');
+    
+    showToast('🚀 Triggering full leaderboard update...', 'info');
+    
+    // Add spinning animation to refresh icon
+    if (refreshIcon) {
+        refreshIcon.classList.add('fa-spin');
+    }
+    
+    if (refreshDropdown) {
+        refreshDropdown.disabled = true;
+    }
+    
+    // Show loading state on leaderboard
+    showLoadingState();
+    
+    fetch('/api/trigger-update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('✅ ' + data.message, 'success');
+                
+                // Optionally refresh the current display after a delay
+                setTimeout(() => {
+                    showToast('🔄 Auto-refreshing display with updated data...', 'info');
+                    fetchLiveData(true); // silent refresh to show updated data
+                }, 3000);
+                
+            } else {
+                showToast('❌ ' + data.message, 'error');
+                console.error('Full update failed:', data.message);
+            }
+        })
+        .catch(error => {
+            showToast('❌ Failed to trigger update: ' + error.message, 'error');
+            console.error('Full update error:', error);
+        })
+        .finally(() => {
+            // Remove loading states
+            hideLoadingState();
+            
+            if (refreshIcon) {
+                refreshIcon.classList.remove('fa-spin');
+            }
+            
+            if (refreshDropdown) {
+                refreshDropdown.disabled = false;
             }
         });
 }

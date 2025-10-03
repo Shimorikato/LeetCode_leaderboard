@@ -800,6 +800,72 @@ def api_live_data():
             'timestamp': datetime.now().isoformat()
         }), 500
 
+@app.route('/api/trigger-update', methods=['POST'])
+def api_trigger_github_update():
+    """API endpoint to trigger GitHub Action workflow for leaderboard update."""
+    try:
+        # Check if GitHub token is available
+        github_token = os.environ.get('GITHUB_TOKEN')
+        if not github_token:
+            return jsonify({
+                'success': False,
+                'message': 'GitHub token not configured. Update will happen automatically every 2 hours.',
+                'timestamp': datetime.now().isoformat()
+            }), 400
+        
+        print("🚀 Manual trigger: Starting GitHub Action workflow...")
+        
+        # Trigger repository_dispatch event to start the workflow
+        dispatch_url = "https://api.github.com/repos/Shimorikato/LeetCode_leaderboard/dispatches"
+        headers = {
+            "Authorization": f"Bearer {github_token}",
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "event_type": "update-leaderboard",
+            "client_payload": {
+                "trigger": "manual_button",
+                "timestamp": datetime.now().isoformat(),
+                "source": "vercel_refresh_button"
+            }
+        }
+        
+        response = requests.post(dispatch_url, headers=headers, json=payload, timeout=15)
+        
+        if response.status_code == 204:
+            print("✅ GitHub Action workflow triggered successfully!")
+            return jsonify({
+                'success': True,
+                'message': 'GitHub Action triggered! Leaderboard data will be updated in ~2-3 minutes.',
+                'timestamp': datetime.now().isoformat(),
+                'workflow_status': 'triggered'
+            })
+        else:
+            print(f"❌ GitHub Action trigger failed: {response.status_code} - {response.text}")
+            return jsonify({
+                'success': False,
+                'message': f'Failed to trigger GitHub Action: HTTP {response.status_code}',
+                'timestamp': datetime.now().isoformat(),
+                'error_details': response.text
+            }), 500
+            
+    except requests.exceptions.Timeout:
+        return jsonify({
+            'success': False,
+            'message': 'Request timed out. Please try again.',
+            'timestamp': datetime.now().isoformat()
+        }), 408
+        
+    except Exception as e:
+        print(f"Error triggering GitHub Action: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error triggering update: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
 @app.route('/api/refresh_all', methods=['POST'])
 def api_refresh_all_old():
     """API endpoint to refresh all users' data."""
