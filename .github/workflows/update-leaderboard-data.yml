@@ -8,6 +8,9 @@ on:
     # Run every 2 hours during active hours (8 AM to 10 PM UTC)
     - cron: '0 8-22/2 * * *'
 
+permissions:
+  contents: write
+
 jobs:
   update-data:
     runs-on: ubuntu-latest
@@ -48,8 +51,8 @@ jobs:
     - name: Commit and push changes
       if: steps.verify-changed-files.outputs.changed == 'true'
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "LeetCode Leaderboard Bot"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
         
         # Add only the JSON data files
         git add leaderboard_data.json web_leaderboard_data.json
@@ -58,8 +61,8 @@ jobs:
         TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
         git commit -m "🔄 Auto-update leaderboard data ($TIMESTAMP)"
         
-        # Push changes
-        git push origin main
+        # Push changes using the GitHub token
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
         
         echo "✅ Successfully updated leaderboard data"
     
