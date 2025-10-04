@@ -243,35 +243,54 @@ def calculate_weekly_problems(submission_calendar: str, solved_problems: Dict[st
     # Estimate weekly distribution based on overall difficulty ratios
     total_solved = solved_problems.get("All", 0)
     if total_solved == 0:
-        return {"Easy": 0, "Medium": 0, "Hard": 0, "All": weekly_submissions}
+        return {"Easy": 0, "Medium": 0, "Hard": 0, "All": 0}
     
     # Calculate ratios from total problems
     easy_ratio = solved_problems.get("Easy", 0) / total_solved
     medium_ratio = solved_problems.get("Medium", 0) / total_solved
     hard_ratio = solved_problems.get("Hard", 0) / total_solved
     
-    # Apply ratios to weekly submissions (with some randomization for realism)
-    weekly_easy = int(weekly_submissions * easy_ratio)
-    weekly_medium = int(weekly_submissions * medium_ratio)
-    weekly_hard = int(weekly_submissions * hard_ratio)
+    # IMPROVED ALGORITHM: Estimate unique problems from submissions
+    # Assume ~2-3 submissions per unique problem (failed attempts + final success)
+    estimated_unique_problems = max(1, int(weekly_submissions / 2.5))
+    
+    # Cap at reasonable weekly limits (can't solve more than total)
+    max_weekly = min(estimated_unique_problems, total_solved)
+    
+    # Apply ratios to estimated weekly problems
+    weekly_easy = int(max_weekly * easy_ratio)
+    weekly_medium = int(max_weekly * medium_ratio)
+    weekly_hard = int(max_weekly * hard_ratio)
     
     # Adjust for rounding discrepancies
     total_estimated = weekly_easy + weekly_medium + weekly_hard
-    if total_estimated < weekly_submissions:
+    if total_estimated < max_weekly:
         # Add remainder to most common difficulty
         max_difficulty = max([("Easy", weekly_easy), ("Medium", weekly_medium), ("Hard", weekly_hard)], key=lambda x: x[1])
         if max_difficulty[0] == "Easy":
-            weekly_easy += (weekly_submissions - total_estimated)
+            weekly_easy += (max_weekly - total_estimated)
         elif max_difficulty[0] == "Medium":
-            weekly_medium += (weekly_submissions - total_estimated)
+            weekly_medium += (max_weekly - total_estimated)
         else:
-            weekly_hard += (weekly_submissions - total_estimated)
+            weekly_hard += (max_weekly - total_estimated)
+    
+    # FINAL SANITY CHECKS: Weekly can't exceed total in any category
+    total_easy = solved_problems.get("Easy", 0)
+    total_medium = solved_problems.get("Medium", 0) 
+    total_hard = solved_problems.get("Hard", 0)
+    
+    # Cap weekly at total limits
+    weekly_easy = min(weekly_easy, total_easy)
+    weekly_medium = min(weekly_medium, total_medium)
+    weekly_hard = min(weekly_hard, total_hard)
+    
+    weekly_total = weekly_easy + weekly_medium + weekly_hard
     
     return {
         "Easy": weekly_easy,
         "Medium": weekly_medium, 
         "Hard": weekly_hard,
-        "All": weekly_submissions
+        "All": weekly_total  # Use corrected total, not raw submissions
     }
 
 
