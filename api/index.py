@@ -682,18 +682,18 @@ def api_refresh_all():
 def api_live_data():
     """API endpoint to get fresh LeetCode data - refreshes on every call and saves to JSON files."""
     try:
-        # Get all current usernames from the leaderboard instead of hardcoding
-        # This prevents losing users when new ones are added
+        # Get all existing usernames from the leaderboard instead of hardcoded list
+        global leaderboard
+        
+        # Get all usernames from existing data
         usernames = list(leaderboard.users.keys()) if leaderboard.users else []
         
-        # Fallback to default users if leaderboard is empty
         if not usernames:
-            usernames = ['aayush17sty', 'lvuyfpznia', 'tanishq_kochar']
-        
-        print(f"🔄 Updating data for {len(usernames)} users: {', '.join(usernames)}")
-        
-        # Use the global leaderboard instance instead of creating a temporary one
-        global leaderboard
+            return jsonify({
+                'success': False,
+                'message': 'No users found in leaderboard',
+                'timestamp': datetime.now().isoformat()
+            }), 404
         
         # Fetch fresh data for each user and save to files
         updated_users = []

@@ -116,9 +116,9 @@ def get_user_stats(username: str) -> Optional[Dict]:
                     for tag_data in tag_counts[level]:
                         topics[tag_data["tagName"]] = topics.get(tag_data["tagName"], 0) + tag_data["problemsSolved"]
         
-        # Calculate weekly problems from submission calendar
+        # Calculate weekly problems from recent submissions (more accurate for unique counting)
         submission_calendar = user.get("submissionCalendar", "")
-        weekly_problems = calculate_weekly_problems(submission_calendar, solved)
+        weekly_problems = calculate_weekly_problems_accurate(recent_submissions, submission_calendar)
         
         # Calculate scores - both total and weekly
         total_base_score = (solved.get("Easy", 0) * 1 + 
@@ -243,65 +243,141 @@ def calculate_weekly_problems(submission_calendar: str, solved_problems: Dict[st
     # Estimate weekly distribution based on overall difficulty ratios
     total_solved = solved_problems.get("All", 0)
     if total_solved == 0:
-        return {"Easy": 0, "Medium": 0, "Hard": 0, "All": 0}
+        return {"Easy": 0, "Medium": 0, "Hard": 0, "All": weekly_submissions}
     
     # Calculate ratios from total problems
     easy_ratio = solved_problems.get("Easy", 0) / total_solved
     medium_ratio = solved_problems.get("Medium", 0) / total_solved
     hard_ratio = solved_problems.get("Hard", 0) / total_solved
     
-    # IMPROVED ALGORITHM: Estimate unique problems from submissions
-    # Assume ~2-3 submissions per unique problem (failed attempts + final success)
-    estimated_unique_problems = max(1, int(weekly_submissions / 2.5))
-    
-    # Cap at reasonable weekly limits (can't solve more than total)
-    max_weekly = min(estimated_unique_problems, total_solved)
-    
-    # Apply ratios to estimated weekly problems
-    weekly_easy = int(max_weekly * easy_ratio)
-    weekly_medium = int(max_weekly * medium_ratio)
-    weekly_hard = int(max_weekly * hard_ratio)
+    # Apply ratios to weekly submissions (with some randomization for realism)
+    weekly_easy = int(weekly_submissions * easy_ratio)
+    weekly_medium = int(weekly_submissions * medium_ratio)
+    weekly_hard = int(weekly_submissions * hard_ratio)
     
     # Adjust for rounding discrepancies
     total_estimated = weekly_easy + weekly_medium + weekly_hard
-    if total_estimated < max_weekly:
+    if total_estimated < weekly_submissions:
         # Add remainder to most common difficulty
         max_difficulty = max([("Easy", weekly_easy), ("Medium", weekly_medium), ("Hard", weekly_hard)], key=lambda x: x[1])
         if max_difficulty[0] == "Easy":
-            weekly_easy += (max_weekly - total_estimated)
+            weekly_easy += (weekly_submissions - total_estimated)
         elif max_difficulty[0] == "Medium":
-            weekly_medium += (max_weekly - total_estimated)
+            weekly_medium += (weekly_submissions - total_estimated)
         else:
-            weekly_hard += (max_weekly - total_estimated)
-    
-    # FINAL SANITY CHECKS: Weekly can't exceed total in any category
-    total_easy = solved_problems.get("Easy", 0)
-    total_medium = solved_problems.get("Medium", 0) 
-    total_hard = solved_problems.get("Hard", 0)
-    
-    # Cap weekly at total limits
-    weekly_easy = min(weekly_easy, total_easy)
-    weekly_medium = min(weekly_medium, total_medium)
-    weekly_hard = min(weekly_hard, total_hard)
-    
-    weekly_total = weekly_easy + weekly_medium + weekly_hard
+            weekly_hard += (weekly_submissions - total_estimated)
     
     return {
         "Easy": weekly_easy,
         "Medium": weekly_medium, 
         "Hard": weekly_hard,
-        "All": weekly_total  # Use corrected total, not raw submissions
+        "All": weekly_submissions
+    }
+
+
+def calculate_weekly_problems_accurate(recent_submissions, submission_calendar):
+    """Calculate problems solved in the current week with difficulty breakdown using actual submissions."""
+    week_start_ts, week_end_ts = get_current_week_bounds()
+    
+    # Track unique problems solved this week with their difficulties
+    weekly_problems = {}  # title_slug -> difficulty
+    
+    if recent_submissions:
+        for submission in recent_submissions:
+            try:
+                submission_ts = int(submission.get('timestamp', 0))
+                status = submission.get('statusDisplay', '')
+                title_slug = submission.get('titleSlug', '')
+                
+                # Only count accepted submissions in current week
+                if (week_start_ts <= submission_ts <= week_end_ts and 
+                    status == 'Accepted' and title_slug):
+                    
+                    # Avoid duplicate problems - only count each problem once
+                    if title_slug not in weekly_problems:
+                        difficulty = get_problem_difficulty(title_slug)
+                        weekly_problems[title_slug] = difficulty
+            except:
+                continue
+    
+    # Count by difficulty
+    weekly_easy = sum(1 for d in weekly_problems.values() if d.lower() == 'easy')
+    weekly_medium = sum(1 for d in weekly_problems.values() if d.lower() == 'medium')
+    weekly_hard = sum(1 for d in weekly_problems.values() if d.lower() == 'hard')
+    weekly_total = len(weekly_problems)
+    
+    # Fallback if no recent submissions found - use calendar method
+    if weekly_total == 0:
+        print("📅 No recent submissions found, falling back to calendar estimation...")
+        calendar_data = {}
+        try:
+            if submission_calendar:
+                calendar_data = json.loads(submission_calendar)
+        except:
+            calendar_data = {}
+        
+        # Count submissions in current week from calendar
+        weekly_submissions = 0
+        current_ts = week_start_ts
+        while current_ts <= week_end_ts:
+            date_key = str(current_ts)
+            weekly_submissions += calendar_data.get(date_key, 0)
+            current_ts += 86400  # Add one day in seconds
+        
+        # Rough estimate with typical difficulty distribution
+        estimated_problems = int(weekly_submissions * 0.7)  # 70% acceptance rate
+        weekly_easy = int(estimated_problems * 0.5)    # 50% easy
+        weekly_medium = int(estimated_problems * 0.4)  # 40% medium  
+        weekly_hard = estimated_problems - weekly_easy - weekly_medium  # 10% hard
+        weekly_total = estimated_problems
+    
+    return {
+        'Easy': weekly_easy,
+        'Medium': weekly_medium,
+        'Hard': weekly_hard,
+        'All': weekly_total
     }
 
 
 def get_problem_difficulty(title_slug: str) -> str:
     """
-    Get problem difficulty by title slug.
-    This is a simplified approach - in practice you'd need a problem database.
+    Get problem difficulty by title slug from LeetCode API.
     """
-    # This would ideally query LeetCode's problem database
-    # For now, return "Medium" as default
-    return "Medium"
+    try:
+        url = "https://leetcode.com/graphql"
+        query = """
+        query getProblemDifficulty($titleSlug: String!) {
+          question(titleSlug: $titleSlug) {
+            difficulty
+          }
+        }
+        """
+        
+        variables = {"titleSlug": title_slug}
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'LeetCode-Leaderboard/1.0'
+        }
+        
+        response = requests.post(
+            url,
+            json={"query": query, "variables": variables},
+            headers=headers,
+            timeout=5
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("data") and data["data"].get("question"):
+                difficulty = data["data"]["question"].get("difficulty", "Medium")
+                return difficulty.lower()
+        
+        # Fallback to medium if API fails
+        return "medium"
+        
+    except Exception as e:
+        print(f"⚠️ Could not fetch difficulty for {title_slug}: {e}")
+        return "medium"  # Default to medium difficulty
 
 
 def analyze_time_frames(submission_calendar: str, recent_submissions: List) -> Dict:
