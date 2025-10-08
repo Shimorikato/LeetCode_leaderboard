@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional
 import calendar
 
@@ -100,6 +100,8 @@ def get_user_stats(username: str) -> Optional[Dict]:
         
         # Parse recent submissions for advanced scoring
         recent_submissions = data["data"].get("recentSubmissionList", [])
+        if recent_submissions is None:
+            recent_submissions = []
         
         # Parse language distribution
         languages = {}
@@ -116,9 +118,11 @@ def get_user_stats(username: str) -> Optional[Dict]:
                     for tag_data in tag_counts[level]:
                         topics[tag_data["tagName"]] = topics.get(tag_data["tagName"], 0) + tag_data["problemsSolved"]
         
-        # Calculate weekly problems from recent submissions (more accurate for unique counting)
+        # Calculate weekly problems from recent submissions (same method as total)
+        weekly_problems = calculate_weekly_problems_from_submissions(recent_submissions)
+        
+        # Get submission calendar for additional data
         submission_calendar = user.get("submissionCalendar", "")
-        weekly_problems = calculate_weekly_problems_accurate(recent_submissions, submission_calendar)
         
         # Calculate scores - both total and weekly
         total_base_score = (solved.get("Easy", 0) * 1 + 
@@ -159,6 +163,7 @@ def get_user_stats(username: str) -> Optional[Dict]:
             "topics": topics,
             "recent_submissions": recent_submissions[:10],
             "submission_calendar": submission_calendar,
+            "weekly_problems": weekly_problems,  # Add the weekly problems dict
             "last_updated": datetime.now().isoformat()
         }
         
@@ -178,21 +183,24 @@ def get_user_stats(username: str) -> Optional[Dict]:
 
 def get_current_week_bounds():
     """
-    Get the start and end timestamps for the current week (Monday to Sunday).
+    Get the start and end timestamps for the current week (Monday to Sunday) in UTC.
+    This matches LeetCode's timezone for consistency.
     
     Returns:
         tuple: (week_start_timestamp, week_end_timestamp)
     """
-    now = datetime.now()
-    # Get the Monday of current week
-    days_since_monday = now.weekday()
-    week_start = now - timedelta(days=days_since_monday)
-    week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
+    # Use UTC time to match LeetCode's timezone
+    now_utc = datetime.now(timezone.utc)
     
-    # Get the Sunday of current week
-    week_end = week_start + timedelta(days=6, hours=23, minutes=59, seconds=59)
+    # Get the Monday of current week in UTC
+    days_since_monday = now_utc.weekday()
+    week_start_utc = now_utc - timedelta(days=days_since_monday)
+    week_start_utc = week_start_utc.replace(hour=0, minute=0, second=0, microsecond=0)
     
-    return int(week_start.timestamp()), int(week_end.timestamp())
+    # Get the Sunday of current week in UTC
+    week_end_utc = week_start_utc + timedelta(days=6, hours=23, minutes=59, seconds=59)
+    
+    return int(week_start_utc.timestamp()), int(week_end_utc.timestamp())
 
 
 def parse_submission_calendar(submission_calendar_str: str) -> Dict[str, int]:
@@ -211,6 +219,106 @@ def parse_submission_calendar(submission_calendar_str: str) -> Dict[str, int]:
         return {}
     except (json.JSONDecodeError, TypeError):
         return {}
+
+
+def lookup_problem_difficulty(title: str) -> str:
+    """Get LeetCode problem difficulty by title."""
+    easy_problems = {
+        "Best Time to Buy and Sell Stock", "Pascal's Triangle", "Pascal's Triangle II", 
+        "Valid Palindrome", "Single Number", "Linked List Cycle", "Maximum Depth of Binary Tree",
+        "Symmetric Tree", "Path Sum", "Minimum Depth of Binary Tree", "Balanced Binary Tree",
+        "Convert Sorted Array to Binary Search Tree", "Binary Tree Inorder Traversal", "Same Tree",
+        "Merge Sorted Array", "Remove Duplicates from Sorted List", "Climbing Stairs", "Plus One",
+        "Length of Last Word", "Search Insert Position", "Remove Duplicates from Sorted Array",
+        "Merge Two Sorted Lists", "Valid Parentheses", "Roman to Integer", "Palindrome Number",
+        "Two Sum", "Min Cost Climbing Stairs"
+    }
+    
+    medium_problems = {
+        "Number of Islands", "Search a 2D Matrix", "Find Bottom Left Tree Value", "Linked List Cycle II",
+        "Add Two Numbers", "Longest Substring Without Repeating Characters", "Container With Most Water",
+        "3Sum", "Letter Combinations of a Phone Number", "Remove Nth Node From End of List",
+        "Generate Parentheses", "Swap Nodes in Pairs", "Search in Rotated Sorted Array",
+        "Combination Sum", "Permutations", "Group Anagrams", "Maximum Subarray", "Spiral Matrix",
+        "Jump Game", "Merge Intervals", "Unique Paths", "Minimum Path Sum", "Set Matrix Zeroes",
+        "Sort Colors", "Subsets", "Word Search"
+    }
+    
+    hard_problems = {
+        "Median of Two Sorted Arrays", "Regular Expression Matching", "Merge k Sorted Lists",
+        "Wildcard Matching", "Trapping Rain Water", "N-Queens", "Text Justification", "Edit Distance"
+    }
+    
+    if title in medium_problems:
+        return "Medium"
+    elif title in hard_problems:
+        return "Hard"
+    else:
+        return "Easy"  # Default for easy problems and unknown problems
+
+
+def calculate_weekly_problems_from_submissions(recent_submissions: List[Dict]) -> Dict[str, int]:
+    """
+    Calculate weekly problems solved by analyzing recent submissions directly.
+    This uses the SAME method as total calculation - counting unique problems.
+    
+    Args:
+        recent_submissions: List of recent submission objects (can be None)
+        
+    Returns:
+        Dictionary with weekly problems by difficulty
+    """
+    week_start_ts, week_end_ts = get_current_week_bounds()
+    
+    # Handle case where recent_submissions is None or empty
+    if not recent_submissions:
+        print(f"📅 No recent submissions data available for week {datetime.fromtimestamp(week_start_ts).strftime('%Y-%m-%d')} to {datetime.fromtimestamp(week_end_ts).strftime('%Y-%m-%d')}")
+        return {"Easy": 0, "Medium": 0, "Hard": 0, "All": 0}
+    
+    # Track unique problems solved this week by difficulty
+    weekly_problems = {"Easy": set(), "Medium": set(), "Hard": set()}
+    
+    print(f"📅 Analyzing submissions for week {datetime.fromtimestamp(week_start_ts).strftime('%Y-%m-%d')} to {datetime.fromtimestamp(week_end_ts).strftime('%Y-%m-%d')}")
+    
+    submission_count = 0
+    accepted_count = 0
+    
+    for submission in recent_submissions:
+        submission_count += 1
+        timestamp = submission.get('timestamp', 0)
+        
+        # Convert timestamp to int if it's a string
+        try:
+            timestamp = int(timestamp)
+        except (ValueError, TypeError):
+            continue
+        
+        # Check if submission is from this week
+        if week_start_ts <= timestamp <= week_end_ts:
+            status = submission.get('statusDisplay', '')
+            if status == 'Accepted':
+                accepted_count += 1
+                title = submission.get('title', '')
+                # Use the difficulty lookup function instead of defaulting to Easy
+                difficulty = lookup_problem_difficulty(title)
+                
+                if title and difficulty in weekly_problems:
+                    weekly_problems[difficulty].add(title)
+                    date_str = datetime.fromtimestamp(timestamp).strftime('%m-%d')
+                    print(f"  ✅ {date_str}: {title} ({difficulty})")
+    
+    # Convert sets to counts
+    result = {
+        "Easy": len(weekly_problems["Easy"]),
+        "Medium": len(weekly_problems["Medium"]), 
+        "Hard": len(weekly_problems["Hard"]),
+        "All": len(weekly_problems["Easy"]) + len(weekly_problems["Medium"]) + len(weekly_problems["Hard"])
+    }
+    
+    print(f"📊 Found {submission_count} recent submissions, {accepted_count} accepted this week")
+    print(f"🎯 Unique problems this week: {result['Easy']}E + {result['Medium']}M + {result['Hard']}H = {result['All']} total")
+    
+    return result
 
 
 def calculate_weekly_problems(submission_calendar: str, solved_problems: Dict[str, int]) -> Dict[str, int]:
@@ -275,109 +383,14 @@ def calculate_weekly_problems(submission_calendar: str, solved_problems: Dict[st
     }
 
 
-def calculate_weekly_problems_accurate(recent_submissions, submission_calendar):
-    """Calculate problems solved in the current week with difficulty breakdown using actual submissions."""
-    week_start_ts, week_end_ts = get_current_week_bounds()
-    
-    # Track unique problems solved this week with their difficulties
-    weekly_problems = {}  # title_slug -> difficulty
-    
-    if recent_submissions:
-        for submission in recent_submissions:
-            try:
-                submission_ts = int(submission.get('timestamp', 0))
-                status = submission.get('statusDisplay', '')
-                title_slug = submission.get('titleSlug', '')
-                
-                # Only count accepted submissions in current week
-                if (week_start_ts <= submission_ts <= week_end_ts and 
-                    status == 'Accepted' and title_slug):
-                    
-                    # Avoid duplicate problems - only count each problem once
-                    if title_slug not in weekly_problems:
-                        difficulty = get_problem_difficulty(title_slug)
-                        weekly_problems[title_slug] = difficulty
-            except:
-                continue
-    
-    # Count by difficulty
-    weekly_easy = sum(1 for d in weekly_problems.values() if d.lower() == 'easy')
-    weekly_medium = sum(1 for d in weekly_problems.values() if d.lower() == 'medium')
-    weekly_hard = sum(1 for d in weekly_problems.values() if d.lower() == 'hard')
-    weekly_total = len(weekly_problems)
-    
-    # Fallback if no recent submissions found - use calendar method
-    if weekly_total == 0:
-        print("📅 No recent submissions found, falling back to calendar estimation...")
-        calendar_data = {}
-        try:
-            if submission_calendar:
-                calendar_data = json.loads(submission_calendar)
-        except:
-            calendar_data = {}
-        
-        # Count submissions in current week from calendar
-        weekly_submissions = 0
-        current_ts = week_start_ts
-        while current_ts <= week_end_ts:
-            date_key = str(current_ts)
-            weekly_submissions += calendar_data.get(date_key, 0)
-            current_ts += 86400  # Add one day in seconds
-        
-        # Rough estimate with typical difficulty distribution
-        estimated_problems = int(weekly_submissions * 0.7)  # 70% acceptance rate
-        weekly_easy = int(estimated_problems * 0.5)    # 50% easy
-        weekly_medium = int(estimated_problems * 0.4)  # 40% medium  
-        weekly_hard = estimated_problems - weekly_easy - weekly_medium  # 10% hard
-        weekly_total = estimated_problems
-    
-    return {
-        'Easy': weekly_easy,
-        'Medium': weekly_medium,
-        'Hard': weekly_hard,
-        'All': weekly_total
-    }
-
-
 def get_problem_difficulty(title_slug: str) -> str:
     """
-    Get problem difficulty by title slug from LeetCode API.
+    Get problem difficulty by title slug.
+    This is a simplified approach - in practice you'd need a problem database.
     """
-    try:
-        url = "https://leetcode.com/graphql"
-        query = """
-        query getProblemDifficulty($titleSlug: String!) {
-          question(titleSlug: $titleSlug) {
-            difficulty
-          }
-        }
-        """
-        
-        variables = {"titleSlug": title_slug}
-        headers = {
-            'Content-Type': 'application/json',
-            'User-Agent': 'LeetCode-Leaderboard/1.0'
-        }
-        
-        response = requests.post(
-            url,
-            json={"query": query, "variables": variables},
-            headers=headers,
-            timeout=5
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("data") and data["data"].get("question"):
-                difficulty = data["data"]["question"].get("difficulty", "Medium")
-                return difficulty.lower()
-        
-        # Fallback to medium if API fails
-        return "medium"
-        
-    except Exception as e:
-        print(f"⚠️ Could not fetch difficulty for {title_slug}: {e}")
-        return "medium"  # Default to medium difficulty
+    # This would ideally query LeetCode's problem database
+    # For now, return "Medium" as default
+    return "Medium"
 
 
 def analyze_time_frames(submission_calendar: str, recent_submissions: List) -> Dict:
