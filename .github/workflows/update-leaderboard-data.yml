@@ -1,5 +1,5 @@
-# Version: 2025-10-03-v3 - Fixed authentication with git-auto-commit-action
-name: Update Leaderboard Data
+# Version: 2025-10-09-v4 - Enhanced with automatic Vercel deployment
+name: Update Leaderboard Data & Deploy
 
 on:
   repository_dispatch:
@@ -19,8 +19,8 @@ jobs:
     steps:
       - name: Verify workflow version
         run: |
-          echo "🔧 Using workflow version: 2025-10-03-v3"
-          echo "✅ This version uses git-auto-commit-action for authentication"
+          echo "🔧 Using workflow version: 2025-10-09-v4"
+          echo "✅ This version updates data and deploys to Vercel automatically"
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,7 +41,9 @@ jobs:
       - name: Update LeetCode data
         run: |
           echo "🔄 Fetching fresh LeetCode data..."
+          echo "📊 Running leaderboard update for all users..."
           python leetcode_leaderboard.py --update-all --batch
+          echo "✅ Data update completed successfully"
 
       - name: Check for changes
         id: verify-changed-files
@@ -64,20 +66,31 @@ jobs:
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
-      - name: Generate environment variable for Vercel (optional)
+      - name: Deploy to Vercel
         if: steps.verify-changed-files.outputs.changed == 'true'
-        continue-on-error: true
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          echo "🔐 Generating environment variable for Vercel..."
-
-          # Check if the required files exist
-          if [ ! -f "manual_vercel_update.py" ]; then
-            echo "⚠️ manual_vercel_update.py not found, skipping Vercel update"
-            exit 0
+          echo "� Deploying updated data to Vercel..."
+          
+          # Run the automatic deployment script
+          if [ -f "auto_deploy.py" ]; then
+            echo "📦 Running auto deployment script..."
+            python auto_deploy.py
+            echo "✅ Vercel deployment completed successfully"
+          else
+            echo "⚠️ auto_deploy.py not found, skipping Vercel deployment"
+            echo "💡 Data has been committed to GitHub and will trigger auto-deploy.yml workflow"
           fi
+          
+          echo "🔗 Check deployment status at: https://vercel.com/dashboard"
 
-          # Run the Vercel update script
-          python manual_vercel_update.py || echo "⚠️ Vercel update script failed, but continuing..."
-
-          echo "📋 Note: Manual Vercel dashboard update may be required"
-          echo "🔗 Visit https://vercel.com/dashboard to update environment variables if needed"
+      - name: Workflow summary
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          echo "📋 Workflow Summary:"
+          echo "✅ LeetCode data updated successfully"
+          echo "✅ Changes committed to GitHub"
+          echo "✅ Vercel deployment triggered"
+          echo "🌐 Your leaderboard should be live shortly!"

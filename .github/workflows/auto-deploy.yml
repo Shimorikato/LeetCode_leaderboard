@@ -3,6 +3,12 @@ name: Auto Deploy to Vercel
 on:
   push:
     branches: [main]
+    paths: 
+      - 'leaderboard_data.json'
+      - 'web_leaderboard_data.json'
+      - 'api/**'
+      - 'templates/**'
+      - 'static/**'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -28,8 +34,25 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          # First update the local data
-          python leetcode_leaderboard.py --update-all --batch
+          echo "🔄 Starting deployment process..."
+          
+          # Check if this is a data-only update or full deployment
+          if git diff --name-only HEAD~1 HEAD | grep -E "(leaderboard_data\.json|web_leaderboard_data\.json)"; then
+            echo "📊 Data files updated, refreshing LeetCode data..."
+            python leetcode_leaderboard.py --update-all --batch
+          else
+            echo "🏗️ Code changes detected, updating data before deployment..."
+            python leetcode_leaderboard.py --update-all --batch
+          fi
 
-          # Then run our auto deploy script
-          python auto_deploy.py
+          echo "🚀 Deploying to Vercel..."
+          # Run our auto deploy script
+          if [ -f "auto_deploy.py" ]; then
+            python auto_deploy.py
+            echo "✅ Vercel deployment completed successfully"
+          else
+            echo "⚠️ auto_deploy.py not found"
+            echo "💡 Vercel will auto-deploy from GitHub push"
+          fi
+          
+          echo "🌐 Deployment finished! Check https://vercel.com/dashboard for status"
