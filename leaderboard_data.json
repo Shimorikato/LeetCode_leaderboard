@@ -158,7 +158,7 @@
       }
     ],
     "submission_calendar": "{\"1738022400\": 1, \"1738368000\": 3, \"1738627200\": 11, \"1738713600\": 4, \"1741737600\": 1, \"1743206400\": 2, \"1750377600\": 2, \"1750464000\": 15, \"1750809600\": 1, \"1751673600\": 8, \"1751760000\": 5, \"1751846400\": 6, \"1751932800\": 1, \"1752019200\": 1, \"1752105600\": 2, \"1752364800\": 2, \"1753574400\": 1, \"1753747200\": 4, \"1753833600\": 1, \"1753920000\": 6, \"1754006400\": 4, \"1754179200\": 2, \"1754265600\": 6, \"1754352000\": 7, \"1754784000\": 3, \"1754870400\": 3, \"1754956800\": 3, \"1755043200\": 1, \"1755129600\": 1, \"1755475200\": 5, \"1755561600\": 4, \"1755648000\": 1, \"1755734400\": 2, \"1755820800\": 5, \"1755907200\": 7, \"1755993600\": 4, \"1756080000\": 1, \"1756166400\": 5, \"1756425600\": 7, \"1756512000\": 1, \"1756684800\": 1, \"1756771200\": 1, \"1756857600\": 2, \"1756944000\": 1, \"1757030400\": 2, \"1757116800\": 1, \"1758067200\": 2, \"1758499200\": 1, \"1758672000\": 3, \"1758931200\": 11, \"1759104000\": 16, \"1759190400\": 3, \"1759536000\": 1, \"1759881600\": 7, \"1729814400\": 6, \"1729900800\": 1, \"1730073600\": 2, \"1730160000\": 3, \"1731196800\": 1, \"1734912000\": 1}",
-    "last_updated": "2025-10-08T14:17:46.706780",
+    "last_updated": "2025-10-08T16:21:01.952776",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -170,30 +170,30 @@
     "username": "LvuYfPzniA",
     "real_name": "LvuYfPzniA",
     "ranking": 2880486,
-    "total_solved": 31,
-    "easy": 28,
+    "total_solved": 35,
+    "easy": 32,
     "medium": 2,
     "hard": 1,
-    "base_score": 41,
-    "weekly_total": 0,
-    "weekly_easy": 0,
+    "base_score": 45,
+    "weekly_total": 5,
+    "weekly_easy": 5,
     "weekly_medium": 0,
     "weekly_hard": 0,
-    "weekly_base_score": 0,
+    "weekly_base_score": 5,
     "current_week": "2025-10-06 to 2025-10-12",
     "languages": {
       "Java": 4,
-      "Python3": 27
+      "Python3": 31
     },
     "topics": {
-      "Array": 12,
+      "Array": 15,
       "Matrix": 1,
-      "String": 8,
+      "String": 9,
       "Simulation": 1,
       "Sorting": 3,
       "Stack": 2,
       "Linked List": 3,
-      "Two Pointers": 4,
+      "Two Pointers": 5,
       "Tree": 8,
       "Binary Tree": 8,
       "Hash Table": 6,
@@ -202,14 +202,84 @@
       "Breadth-First Search": 5,
       "Recursion": 2,
       "Sliding Window": 1,
-      "Bit Manipulation": 1,
+      "Bit Manipulation": 2,
       "Math": 6,
       "Backtracking": 1,
-      "Dynamic Programming": 3,
+      "Dynamic Programming": 5,
       "Divide and Conquer": 1,
       "Trie": 1
     },
     "recent_submissions": [
+      {
+        "title": "Linked List Cycle",
+        "titleSlug": "linked-list-cycle",
+        "timestamp": "1759937421",
+        "statusDisplay": "Runtime Error",
+        "lang": "python3",
+        "runtime": "N/A",
+        "memory": "N/A",
+        "url": "/submissions/detail/1795452745/"
+      },
+      {
+        "title": "Single Number",
+        "titleSlug": "single-number",
+        "timestamp": "1759936665",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "7 ms",
+        "memory": "20.2 MB",
+        "url": "/submissions/detail/1795439998/"
+      },
+      {
+        "title": "Single Number",
+        "titleSlug": "single-number",
+        "timestamp": "1759936652",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "6 ms",
+        "memory": "20.1 MB",
+        "url": "/submissions/detail/1795439778/"
+      },
+      {
+        "title": "Valid Palindrome",
+        "titleSlug": "valid-palindrome",
+        "timestamp": "1759935919",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "11 ms",
+        "memory": "23.3 MB",
+        "url": "/submissions/detail/1795427330/"
+      },
+      {
+        "title": "Best Time to Buy and Sell Stock",
+        "titleSlug": "best-time-to-buy-and-sell-stock",
+        "timestamp": "1759935276",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "76 ms",
+        "memory": "26.9 MB",
+        "url": "/submissions/detail/1795416588/"
+      },
+      {
+        "title": "Pascal's Triangle II",
+        "titleSlug": "pascals-triangle-ii",
+        "timestamp": "1759935265",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "0 ms",
+        "memory": "17.6 MB",
+        "url": "/submissions/detail/1795416429/"
+      },
+      {
+        "title": "Pascal's Triangle",
+        "titleSlug": "pascals-triangle",
+        "timestamp": "1759934856",
+        "statusDisplay": "Accepted",
+        "lang": "python3",
+        "runtime": "0 ms",
+        "memory": "17.5 MB",
+        "url": "/submissions/detail/1795409660/"
+      },
       {
         "title": "Best Time to Buy and Sell Stock",
         "titleSlug": "best-time-to-buy-and-sell-stock",
@@ -239,80 +309,10 @@
         "runtime": "95 ms",
         "memory": "26.9 MB",
         "url": "/submissions/detail/1790213686/"
-      },
-      {
-        "title": "Best Time to Buy and Sell Stock",
-        "titleSlug": "best-time-to-buy-and-sell-stock",
-        "timestamp": "1759500822",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "86 ms",
-        "memory": "26.9 MB",
-        "url": "/submissions/detail/1790213499/"
-      },
-      {
-        "title": "Best Time to Buy and Sell Stock",
-        "titleSlug": "best-time-to-buy-and-sell-stock",
-        "timestamp": "1759500794",
-        "statusDisplay": "Wrong Answer",
-        "lang": "python3",
-        "runtime": "N/A",
-        "memory": "N/A",
-        "url": "/submissions/detail/1790213122/"
-      },
-      {
-        "title": "Path Sum",
-        "titleSlug": "path-sum",
-        "timestamp": "1759361361",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "0 ms",
-        "memory": "18.9 MB",
-        "url": "/submissions/detail/1788689179/"
-      },
-      {
-        "title": "Minimum Depth of Binary Tree",
-        "titleSlug": "minimum-depth-of-binary-tree",
-        "timestamp": "1759359308",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "42 ms",
-        "memory": "50.4 MB",
-        "url": "/submissions/detail/1788676998/"
-      },
-      {
-        "title": "Minimum Depth of Binary Tree",
-        "titleSlug": "minimum-depth-of-binary-tree",
-        "timestamp": "1759359301",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "40 ms",
-        "memory": "50.5 MB",
-        "url": "/submissions/detail/1788676951/"
-      },
-      {
-        "title": "Balanced Binary Tree",
-        "titleSlug": "balanced-binary-tree",
-        "timestamp": "1759273034",
-        "statusDisplay": "Accepted",
-        "lang": "python3",
-        "runtime": "0 ms",
-        "memory": "18.7 MB",
-        "url": "/submissions/detail/1787693764/"
-      },
-      {
-        "title": "Balanced Binary Tree",
-        "titleSlug": "balanced-binary-tree",
-        "timestamp": "1759272657",
-        "statusDisplay": "Wrong Answer",
-        "lang": "python3",
-        "runtime": "N/A",
-        "memory": "N/A",
-        "url": "/submissions/detail/1787691527/"
       }
     ],
-    "submission_calendar": "{\"1747440000\": 2, \"1747612800\": 2, \"1748131200\": 1, \"1754438400\": 1, \"1754611200\": 8, \"1754870400\": 4, \"1754956800\": 1, \"1755907200\": 11, \"1756598400\": 6, \"1758240000\": 2, \"1758326400\": 3, \"1758931200\": 2, \"1759017600\": 1, \"1759104000\": 7, \"1759190400\": 13, \"1759276800\": 3, \"1759449600\": 5}",
-    "last_updated": "2025-10-08T14:17:48.462713",
+    "submission_calendar": "{\"1747440000\": 2, \"1747612800\": 2, \"1748131200\": 1, \"1754438400\": 1, \"1754611200\": 8, \"1754870400\": 4, \"1754956800\": 1, \"1755907200\": 11, \"1756598400\": 6, \"1758240000\": 2, \"1758326400\": 3, \"1758931200\": 2, \"1759017600\": 1, \"1759104000\": 7, \"1759190400\": 13, \"1759276800\": 3, \"1759449600\": 5, \"1759881600\": 7}",
+    "last_updated": "2025-10-08T16:21:05.196182",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -463,7 +463,7 @@
       }
     ],
     "submission_calendar": "{\"1736035200\": 7, \"1736640000\": 2, \"1749168000\": 2, \"1753142400\": 2, \"1758931200\": 3, \"1759276800\": 1, \"1759363200\": 3, \"1733356800\": 1, \"1733443200\": 2, \"1733529600\": 1, \"1733702400\": 6, \"1733961600\": 1}",
-    "last_updated": "2025-10-08T14:17:50.563351",
+    "last_updated": "2025-10-08T16:21:06.777893",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -631,7 +631,7 @@
       }
     ],
     "submission_calendar": "{\"1740528000\": 1, \"1749686400\": 15, \"1749859200\": 14, \"1750204800\": 12, \"1751414400\": 3, \"1751500800\": 9, \"1751673600\": 5, \"1751846400\": 1, \"1752192000\": 24, \"1752278400\": 13, \"1752364800\": 31, \"1752796800\": 2, \"1753228800\": 10, \"1753488000\": 6, \"1753574400\": 15, \"1753660800\": 1, \"1754006400\": 6, \"1754092800\": 24, \"1754179200\": 28, \"1754352000\": 12, \"1754438400\": 28, \"1754524800\": 8, \"1754611200\": 4, \"1755216000\": 9, \"1755388800\": 3, \"1755475200\": 8, \"1755907200\": 2, \"1756166400\": 8, \"1756252800\": 1, \"1756339200\": 1, \"1756425600\": 18, \"1756512000\": 2, \"1758672000\": 2, \"1759190400\": 2, \"1759276800\": 3, \"1759449600\": 8, \"1759536000\": 4, \"1759795200\": 2, \"1728691200\": 4, \"1729209600\": 7}",
-    "last_updated": "2025-10-08T14:17:52.821345",
+    "last_updated": "2025-10-08T16:21:09.101270",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -775,7 +775,7 @@
       }
     ],
     "submission_calendar": "{\"1752019200\": 1, \"1752105600\": 1, \"1752192000\": 14, \"1752278400\": 10, \"1752364800\": 8, \"1752451200\": 5, \"1756339200\": 5, \"1756425600\": 2, \"1758499200\": 2, \"1759104000\": 5, \"1759190400\": 1, \"1759276800\": 2, \"1759449600\": 9, \"1735171200\": 1}",
-    "last_updated": "2025-10-08T14:17:54.471009",
+    "last_updated": "2025-10-08T16:21:11.572128",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
@@ -924,7 +924,7 @@
       }
     ],
     "submission_calendar": "{\"1751155200\": 6, \"1751673600\": 3, \"1751760000\": 3, \"1751932800\": 13, \"1753315200\": 9, \"1755302400\": 8, \"1755388800\": 6, \"1755561600\": 7, \"1756339200\": 17, \"1756425600\": 17, \"1756684800\": 7, \"1756771200\": 12, \"1758499200\": 2, \"1759104000\": 7, \"1759190400\": 5, \"1759276800\": 17, \"1759449600\": 15, \"1759536000\": 7, \"1759795200\": 18}",
-    "last_updated": "2025-10-08T14:17:56.327093",
+    "last_updated": "2025-10-08T16:21:14.181520",
     "time_analytics": {
       "daily_submissions": 0,
       "weekly_submissions": 0,
