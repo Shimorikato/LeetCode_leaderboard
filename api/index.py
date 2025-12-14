@@ -628,99 +628,76 @@ def api_refresh_all():
 
 @app.route('/api/live-data')
 def api_live_data():
-    """API endpoint to get fresh LeetCode data - refreshes on every call and saves to JSON files."""
+    """Fetch leaderboard data. On Vercel, serve cached data to avoid timeouts."""
     try:
-        # Define usernames to track (you can modify this list)
-        usernames = ['aayush17sty', 'lvuyfpznia', 'tanishq_kochar']
-        
-        # Use the global leaderboard instance instead of creating a temporary one
+        # If running in Vercel serverless, avoid long-running refreshes
+        if os.environ.get('VERCEL'):
+            leaderboard_data = leaderboard.get_leaderboard('weekly_base_score')
+            stats = {}
+            if leaderboard_data:
+                total_weekly_problems = sum(user.get('weekly_total', 0) for user in leaderboard_data)
+                total_weekly_score = sum(user.get('weekly_base_score', 0) for user in leaderboard_data)
+                avg_weekly_score = total_weekly_score / len(leaderboard_data) if leaderboard_data else 0
+                stats = {
+                    'total_users': len(leaderboard_data),
+                    'total_problems': sum(user.get('total_solved', 0) for user in leaderboard_data),
+                    'weekly_problems': total_weekly_problems,
+                    'weekly_score': total_weekly_score,
+                    'avg_weekly_score': round(avg_weekly_score, 1),
+                    'leader': leaderboard_data[0] if leaderboard_data else None,
+                    'last_updated': datetime.now().isoformat(),
+                    'source': 'cache'
+                }
+            return jsonify({
+                'success': True,
+                'leaderboard': leaderboard_data,
+                'stats': stats,
+                'updated_users': 0,
+                'failed_users': [],
+                'timestamp': datetime.now().isoformat(),
+                'note': 'Skipped refresh on Vercel to avoid timeout; use /api/refresh (POST) or background job.'
+            })
+
+        # Local/dev path: perform full refresh of all tracked users
         global leaderboard
-        
-        # Fetch fresh data for each user and save to files
         updated_users = []
         failed_users = []
-        
-        for username in usernames:
+
+        for username in list(leaderboard.users.keys()):
             print(f"Fetching fresh data for {username}...")
-            success = leaderboard.add_user(username)  # This will save to both JSON files
+            success = leaderboard.add_user(username)
             if success:
                 updated_users.append(username)
                 print(f"✅ Updated {username}")
             else:
                 failed_users.append(username)
                 print(f"❌ Failed to update {username}")
-        
-        # Force save to ensure data is persisted
+
         leaderboard.save_data()
-        
-        # Trigger GitHub Action to update repository files
-        try:
-            github_token = os.environ.get('GITHUB_TOKEN')
-            if github_token:
-                print("🔄 Triggering GitHub Action to update repository...")
-                
-                # Trigger repository_dispatch event
-                dispatch_url = "https://api.github.com/repos/Shimorikato/LeetCode_leaderboard/dispatches"
-                headers = {
-                    "Authorization": f"Bearer {github_token}",
-                    "Accept": "application/vnd.github.v3+json",
-                    "Content-Type": "application/json"
-                }
-                
-                payload = {
-                    "event_type": "update-leaderboard",
-                    "client_payload": {
-                        "updated_users": updated_users,
-                        "timestamp": datetime.now().isoformat()
-                    }
-                }
-                
-                response = requests.post(dispatch_url, headers=headers, json=payload, timeout=10)
-                if response.status_code == 204:
-                    print("✅ GitHub Action triggered successfully")
-                else:
-                    print(f"⚠️ GitHub Action trigger failed: {response.status_code}")
-            else:
-                print("ℹ️ GitHub token not available, skipping repository update")
-                
-        except Exception as github_error:
-            print(f"⚠️ GitHub Action trigger failed: {github_error}")
-        
-        # Update Vercel environment variable if tokens are available
+
+        # Update Vercel env var if credentials are present
         try:
             import base64
             vercel_token = os.environ.get('VERCEL_TOKEN')
             project_id = os.environ.get('VERCEL_PROJECT_ID')
-            
             if vercel_token and project_id:
-                print("🔄 Updating Vercel environment variable...")
-                
-                # Encode the fresh data
                 json_str = json.dumps(leaderboard.users, separators=(',', ':'))
                 encoded_data = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
-                
-                # Update Vercel environment variable
                 update_success = update_vercel_env_var(vercel_token, project_id, 'LEADERBOARD_DATA_B64', encoded_data)
                 if update_success:
                     print("✅ Vercel environment variable updated successfully")
-                else:
-                    print("⚠️ Failed to update Vercel environment variable")
             else:
                 print("ℹ️ Vercel credentials not available, skipping environment update")
-                
         except Exception as vercel_error:
             print(f"⚠️ Vercel update failed: {vercel_error}")
-        
-        # Get the updated leaderboard data
+
         leaderboard_data = leaderboard.get_leaderboard('weekly_base_score')
-        
-        # Calculate summary stats
+
         stats = {}
         if leaderboard_data:
             total_weekly_problems = sum(user.get('weekly_total', 0) for user in leaderboard_data)
             total_weekly_score = sum(user.get('weekly_base_score', 0) for user in leaderboard_data)
             avg_weekly_score = total_weekly_score / len(leaderboard_data) if leaderboard_data else 0
-            
             stats = {
                 'total_users': len(leaderboard_data),
                 'total_problems': sum(user.get('total_solved', 0) for user in leaderboard_data),
@@ -730,7 +707,7 @@ def api_live_data():
                 'leader': leaderboard_data[0] if leaderboard_data else None,
                 'last_updated': datetime.now().isoformat()
             }
-        
+
         return jsonify({
             'success': True,
             'leaderboard': leaderboard_data,
@@ -739,14 +716,58 @@ def api_live_data():
             'failed_users': failed_users,
             'timestamp': datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         print(f"Error in live data endpoint: {e}")
         return jsonify({
-            'success': False, 
+            'success': False,
             'message': f'Error fetching live data: {str(e)}',
             'timestamp': datetime.now().isoformat()
         }), 500
+
+
+@app.route('/api/live-data/cache')
+def api_live_data_cache():
+    """Return cached leaderboard without refresh (fast, safe for serverless)."""
+    try:
+        leaderboard_data = leaderboard.get_leaderboard('weekly_base_score')
+        stats = {}
+        if leaderboard_data:
+            total_weekly_problems = sum(user.get('weekly_total', 0) for user in leaderboard_data)
+            total_weekly_score = sum(user.get('weekly_base_score', 0) for user in leaderboard_data)
+            avg_weekly_score = total_weekly_score / len(leaderboard_data) if leaderboard_data else 0
+            stats = {
+                'total_users': len(leaderboard_data),
+                'total_problems': sum(user.get('total_solved', 0) for user in leaderboard_data),
+                'weekly_problems': total_weekly_problems,
+                'weekly_score': total_weekly_score,
+                'avg_weekly_score': round(avg_weekly_score, 1),
+                'leader': leaderboard_data[0] if leaderboard_data else None,
+                'last_updated': datetime.now().isoformat(),
+                'source': 'cache'
+            }
+        return jsonify({
+            'success': True,
+            'leaderboard': leaderboard_data,
+            'stats': stats,
+            'updated_users': 0,
+            'failed_users': [],
+            'timestamp': datetime.now().isoformat(),
+            'note': 'Cached data only; no refresh performed.'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/refresh', methods=['POST'])
+def api_refresh():
+    """Explicit refresh endpoint to update all users; may be slow on serverless."""
+    try:
+        global leaderboard
+        leaderboard.update_all_users()
+        return jsonify({'success': True, 'timestamp': datetime.now().isoformat()})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/api/trigger-update', methods=['POST'])
 def api_trigger_github_update():
