@@ -45,76 +45,24 @@ except ImportError:
             matchedUser(username: $username) {
                 username
                 submitStats {
-                    acSubmissionNum {
-                        difficulty
-                        count
-                    }
-                    totalSubmissionNum {
-                        difficulty
-                        count
-                    }
-                }
-                profile {
-                    ranking
-                    realName
-                    aboutMe
-                    userAvatar
-                    reputation
-                    githubUrl
-                    websites
-                }
-                submissionCalendar
-                recentSubmissionList(limit: 50) {
-                    title
-                    titleSlug
-                    timestamp
-                    statusDisplay
-                    lang
-                    __typename
-                }
-                recentAcSubmissionList(limit: 50) {
-                    id
-                    title
-                    titleSlug
-                    timestamp
-                }
-            }
-        }
-        """
-        
-        variables = {"username": username}
-        headers = {
-            "Content-Type": "application/json",
-            "Referer": "https://leetcode.com",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
-        
-        try:
-            response = requests.post(url, json={"query": query, "variables": variables}, headers=headers)
-            response.raise_for_status()
-            data = response.json()
-            
-            if "errors" in data:
-                return None
-                
-            return data.get("data")
-        except Exception as e:
-            print(f"Error fetching data for {username}: {e}")
-            return None
+                    """Refresh all tracked users and return the latest leaderboard snapshot."""
+                    try:
+                        global leaderboard
 
-    def get_problem_difficulty(title_slug):
-        """Get the difficulty of a specific problem from LeetCode API."""
-        url = "https://leetcode.com/graphql"
-        query = """
-        query questionData($titleSlug: String!) {
-            question(titleSlug: $titleSlug) {
-                difficulty
-                title
-            }
-        }
-        """
-        
-        try:
+                        # Update every user currently tracked (no hardcoded subset)
+                        leaderboard.update_all_users()
+
+                        # Return fresh leaderboard data
+                        sort_by = request.args.get('sort_by', 'weekly_base_score')
+                        leaderboard_data = leaderboard.get_leaderboard(sort_by)
+                        return jsonify({
+                            'success': True,
+                            'updated_users': len(leaderboard_data),
+                            'leaderboard': leaderboard_data
+                        })
+
+                    except Exception as e:
+                        return jsonify({'error': str(e), 'success': False}), 500
             response = requests.post(url, json={
                 "query": query, 
                 "variables": {"titleSlug": title_slug}
