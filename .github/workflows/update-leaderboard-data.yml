@@ -73,7 +73,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           echo "� Deploying updated data to Vercel..."
-          
+
           # Run the automatic deployment script
           if [ -f "auto_deploy.py" ]; then
             echo "📦 Running auto deployment script..."
@@ -83,7 +83,7 @@ jobs:
             echo "⚠️ auto_deploy.py not found, skipping Vercel deployment"
             echo "💡 Data has been committed to GitHub and will trigger auto-deploy.yml workflow"
           fi
-          
+
           echo "🔗 Check deployment status at: https://vercel.com/dashboard"
 
       - name: Workflow summary

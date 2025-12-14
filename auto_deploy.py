@@ -50,6 +50,53 @@ class VercelAutoDeployer:
         except requests.RequestException as e:
             print(f"❌ Error fetching environment variables: {e}")
             return None
+
+    def get_env_var_value(self, key: str):
+        """Return the value of a specific environment variable by key.
+        Vercel's env list doesn't return decrypted values; for comparison,
+        we store our last-deployed value in a dedicated checksum env var.
+
+        Fallback approach:
+        - Look for an env var named f"{key}_CHECKSUM" which stores a short hash.
+        - If present, return that hash; else return None.
+
+        This avoids trying to read encrypted values which Vercel won't expose.
+        """
+        envs = self.get_existing_env_vars() or {}
+        for env in envs.get('envs', []):
+            if env.get('key') == f"{key}_CHECKSUM":
+                # The value is not returned; but for checksums, we store as 'plain'
+                # If Vercel masks values, we cannot fetch it; in that case, skip
+                # comparison and proceed to update. However, if type is 'plain',
+                # we can read it via a separate API. To keep it simple, rely on presence.
+                # Since the API does not expose values, we cannot retrieve it here.
+                # We return a sentinel indicating checksum exists, prompting comparison
+                # using local cache file instead (implemented below).
+                return "exists"
+        return None
+
+    def compute_checksum(self, encoded_data: str) -> str:
+        """Compute a short checksum for the encoded data for change detection."""
+        import hashlib
+        return hashlib.sha256(encoded_data.encode('utf-8')).hexdigest()[:16]
+
+    def read_local_checksum(self) -> str | None:
+        """Read last deployed checksum from a local cache file if present."""
+        cache_path = ".vercel_data_checksum"
+        try:
+            with open(cache_path, 'r', encoding='utf-8') as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            return None
+
+    def write_local_checksum(self, checksum: str) -> None:
+        """Write checksum to a local cache file for subsequent comparisons."""
+        cache_path = ".vercel_data_checksum"
+        try:
+            with open(cache_path, 'w', encoding='utf-8') as f:
+                f.write(checksum)
+        except Exception:
+            pass
     
     def update_env_var(self, key, value):
         """Update or create environment variable in Vercel"""
@@ -81,6 +128,32 @@ class VercelAutoDeployer:
             return True
         except requests.RequestException as e:
             print(f"❌ Error updating environment variable: {e}")
+            return False
+
+    def update_plain_env_var(self, key, value):
+        """Create a non-encrypted env var (for checksum tracking)."""
+        if not self.vercel_token or not self.project_id:
+            return False
+
+        # Delete then recreate
+        self.delete_env_var(key)
+
+        url = f"{self.base_url}/v9/projects/{self.project_id}/env"
+        headers = {
+            "Authorization": f"Bearer {self.vercel_token}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "key": key,
+            "value": value,
+            "type": "plain",
+            "target": ["production", "preview", "development"]
+        }
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            return True
+        except requests.RequestException:
             return False
     
     def delete_env_var(self, key):
@@ -150,6 +223,13 @@ class VercelAutoDeployer:
         # Encode data
         encoded_data = self.encode_data(data)
         print(f"🔐 Encoded data ({len(encoded_data)} characters)")
+
+        # Compute checksum and check local cache to avoid redundant updates
+        checksum = self.compute_checksum(encoded_data)
+        prev_checksum = self.read_local_checksum()
+        if prev_checksum == checksum:
+            print("⏱️ No changes detected (checksum match). Skipping Vercel update.")
+            return True
         
         # Check if we have Vercel credentials
         if not self.vercel_token or not self.project_id:
@@ -187,6 +267,10 @@ class VercelAutoDeployer:
         success = self.update_env_var("LEADERBOARD_DATA_B64", encoded_data)
         if not success:
             return False
+
+        # Store checksum both locally and in Vercel (plain env var)
+        self.write_local_checksum(checksum)
+        self.update_plain_env_var("LEADERBOARD_DATA_B64_CHECKSUM", checksum)
         
         # Trigger deployment
         self.trigger_deployment()

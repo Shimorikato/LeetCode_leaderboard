@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.secret_key = 'leetcode_leaderboard_secret_key_2025'
 
 # Global leaderboard instance
-leaderboard = LeetCodeLeaderboard("web_leaderboard_data.json")
+leaderboard = LeetCodeLeaderboard("leaderboard_data.json")
 
 @app.route('/')
 def index():
@@ -153,6 +153,23 @@ def api_stats():
     }
     
     return jsonify(stats)
+
+
+@app.route('/api/live-data')
+def api_live_data():
+    """Refresh all users and return the latest leaderboard data."""
+    try:
+        leaderboard.update_all_users()
+        sort_by = request.args.get('sort_by', 'weekly_base_score')
+        leaderboard_data = leaderboard.get_leaderboard(sort_by)
+
+        return jsonify({
+            'success': True,
+            'updated_users': len(leaderboard_data),
+            'leaderboard': leaderboard_data
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("🚀 Starting LeetCode Leaderboard Web App...")
