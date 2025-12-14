@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.secret_key = 'leetcode_leaderboard_secret_key_2025'
 
 # Global leaderboard instance
-leaderboard = LeetCodeLeaderboard("leaderboard_data.json")
+leaderboard = LeetCodeLeaderboard("web_leaderboard_data.json")
 
 @app.route('/')
 def index():
